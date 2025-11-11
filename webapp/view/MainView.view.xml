@@ -6,96 +6,154 @@
     xmlns:smartTable="sap.ui.comp.smarttable"
     xmlns:plugins="sap.m.plugins"
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout"
     displayBlock="true"
     height="100%">
     
-    <VBox id="mainContentVBox" fitContainer="true">
-                
-        <!-- Barra de Botones Superior con Iconos -->
-        <OverflowToolbar id="accionesToolbar" design="Solid">
-            <ToolbarSpacer id="spacerInicio"/>
-            
-            <Button 
-                id="btnPosFactura"
-                text="Pos.Factura"
-                icon="sap-icon://documents"
-                enabled="{mainView>/hasSelection}"
-                press="onPosFactura"/>
-            
-            <Button 
-                id="btnDocsAsignados"
-                text="Docs.asignados"
-                icon="sap-icon://document-text"
-                enabled="{mainView>/hasSelection}"
-                press="onDocsAsignados"/>
-            
-            <Button 
-                id="btnProRegistrar"
-                text="Pre-registrar"
-                icon="sap-icon://create-form"
-                enabled="{mainView>/hasSelection}"
-                press="onProRegistrar"/>
-            
-            <Button 
-                id="btnContabilizar"
-                text="Contabilizar"
-                icon="sap-icon://sales-order"
-                enabled="{mainView>/hasSelection}"
-                press="onContabilizar"/>
-            
-            <Button 
-                id="btnVerDocSAP"
-                text="Ver documento SAP"
-                icon="sap-icon://display"
-                enabled="{mainView>/hasSelection}"
-                press="onVerDocumentoSAP"/>
-            
-            <Button 
-                id="btnLogEjecucion"
-                text="Log de ejecución"
-                icon="sap-icon://log"
-                enabled="{mainView>/hasSelection}"
-                press="onVerLog"/>
-            
-            <Button 
-                id="btnFacturaObservada"
-                text="Factura observada"
-                icon="sap-icon://message-warning"
-                enabled="{mainView>/hasSelection}"
-                press="onFacturaObservada"/>
-            
-            <MenuButton 
-                id="btnMas"
-                text="Más"
-                icon="sap-icon://overflow"
-                enabled="{mainView>/hasSelection}">
-                <menu>
-                    <Menu id="menuMas">
-                        <items>
-                            <MenuItem id="menuItem1" text="Opción 1" press="onOpcionMas"/>
-                            <MenuItem id="menuItem2" text="Opción 2" press="onOpcionMas"/>
-                            <MenuItem id="menuItem3" text="Opción 3" press="onOpcionMas"/>
-                        </items>
-                    </Menu>
-                </menu>
-            </MenuButton>
-        </OverflowToolbar>
+    <f:DynamicPage 
+        id="dynamicPageFacturas" 
+        preserveHeaderStateOnScroll="true" 
+        headerExpanded="true" 
+        showFooter="false" 
+        fitContent="true"
+        class="monitorFacturasPage"
+        >
         
-        <!-- Línea Separadora -->
-        <Toolbar id="separadorToolbar" height="2px">
-            <ToolbarSpacer id="spacerSeparador"/>
-        </Toolbar>
-         
-        <!-- Contenedor para el scroll horizontal -->
-        <ScrollContainer 
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Monitor de Facturas"/>
+                </f:heading>
+                
+                <f:expandedContent>
+                    <Label text="Gestión y seguimiento de facturas por procesar"/>
+                </f:expandedContent>
+                
+                <f:snappedContent>
+                    <Label text="Monitor de Facturas"/>
+                </f:snappedContent>
+                
+                <f:content>
+                    <OverflowToolbar>
+                        <GenericTag 
+                            text="Estado"
+                            status="Success"
+                            design="StatusIconHidden">
+                            <ObjectNumber 
+                                number="{facturas>/totalFacturas}"
+                                unit="Facturas"
+                                emphasized="false"
+                                state="Success"/>
+                        </GenericTag>
+                        <ToolbarSpacer/>
+                        <Text text="Seleccionadas: {mainView>/selectedCount}"/>
+                    </OverflowToolbar>
+                </f:content>
+                
+                <f:actions>
+                    <ToolbarSpacer/>
+                    <Button
+                        id="btnExportar"
+                        text="Exportar"
+                        icon="sap-icon://excel-attachment"
+                        type="Transparent"
+                        press="onExportar"/>
+                    <Button
+                        id="btnActualizar"
+                        text="Actualizar"
+                        icon="sap-icon://refresh"
+                        type="Transparent"
+                        press="onActualizar"/>
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <!-- DynamicPage Header - Barra de acciones -->
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <OverflowToolbar id="accionesToolbar" design="Solid">
+                    <ToolbarSpacer id="spacerInicio"/>
+                    
+                    <Button 
+                        id="btnPosFactura"
+                        text="Pos.Factura"
+                        icon="sap-icon://documents"
+                        enabled="{mainView>/hasSelection}"
+                        press="onPosFactura"/>
+                    
+                    <Button 
+                        id="btnDocsAsignados"
+                        text="Docs.asignados"
+                        icon="sap-icon://document-text"
+                        enabled="{mainView>/hasSelection}"
+                        press="onDocsAsignados"/>
+                    
+                    <Button 
+                        id="btnProRegistrar"
+                        text="Pre-registrar"
+                        icon="sap-icon://create-form"
+                        enabled="{mainView>/hasSelection}"
+                        press="onPreRegistrar"/>
+                    
+                    <Button 
+                        id="btnContabilizar"
+                        text="Contabilizar"
+                        icon="sap-icon://sales-order"
+                        enabled="{mainView>/hasSelection}"
+                        press="onContabilizar"/>
+                    
+                    <Button 
+                        id="btnVerDocSAP"
+                        text="Ver documento SAP"
+                        icon="sap-icon://display"
+                        enabled="{mainView>/hasSelection}"
+                        press="onVerDocumentoSAP"/>
+                    
+                    <Button 
+                        id="btnLogEjecucion"
+                        text="Log de ejecución"
+                        icon="sap-icon://log"
+                        enabled="{mainView>/hasSelection}"
+                        press="onVerLog"/>
+                    
+                    <Button 
+                        id="btnFacturaObservada"
+                        text="Factura observada"
+                        icon="sap-icon://message-warning"
+                        enabled="{mainView>/hasSelection}"
+                        press="onFacturaObservada"/>
+                    
+                    <MenuButton 
+                        id="btnMas"
+                        text="Más"
+                        icon="sap-icon://overflow"
+                        enabled="{mainView>/hasSelection}">
+                        <menu>
+                            <Menu id="menuMas">
+                                <items>
+                                    <MenuItem id="menuItem1" text="Opción 1" press="onOpcionMas"/>
+                                    <MenuItem id="menuItem2" text="Opción 2" press="onOpcionMas"/>
+                                    <MenuItem id="menuItem3" text="Opción 3" press="onOpcionMas"/>
+                                </items>
+                            </Menu>
+                        </menu>
+                    </MenuButton>
+                </OverflowToolbar>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <!-- DynamicPage Content - Tabla principal -->
+        <f:content>
+         <ScrollContainer 
             id="tableScrollContainer"
             height="100%"
             width="100%"
             vertical="true"
             horizontal="true"
             focusable="true">
-            
-            <!-- Smart Table Principal con scroll -->
+            <!-- Smart Table Principal -->
             <smartTable:SmartTable 
                 id="smartTableFacturas"
                 entitySet="Facturas"
@@ -104,7 +162,7 @@
                 beforeExport="onBeforeExport"
                 useVariantManagement="false"
                 useTablePersonalisation="true"
-                header="Facturas"
+                header="Lista de Facturas"
                 showRowCount="true"
                 persistencyKey="MonitorFacturasTable"
                 enableAutoBinding="false"
@@ -113,23 +171,21 @@
                 beforeRebindTable="onBeforeRebindTable"
                 app:preserveDecimals="false">
                 
-                <smartTable:layoutData>
-                    <FlexItemData id="flexItemData" growFactor="1" baseSize="0%"/>
-                </smartTable:layoutData>
-                
                 <smartTable:customToolbar>
-                    <OverflowToolbar id="customToolbar" design="Transparent">
-                        <ToolbarSpacer id="toolbarSpacer2"/>
+                    <OverflowToolbar design="Transparent">
+                        <Title text="Facturas por procesar"/>
+                        <ToolbarSpacer/>
+                        <Text text="Total: {facturas>/totalFacturas}"/>
                     </OverflowToolbar>
                 </smartTable:customToolbar>
                 
-                <!-- Tabla interna con scroll horizontal -->
+                <!-- Tabla interna -->
                 <Table 
                     id="tablaFacturas"
                     mode="SingleSelectMaster"
                     selectionChange="onSelectionChange"
                     items="{path: 'facturas>/facturas'}"
-                    fixedLayout="false"  
+                    fixedLayout="false"
                     width="auto"
                 > 
                     
@@ -147,7 +203,7 @@
                         </Column>
                         
                         <Column id="colEscenario" width="4em">
-                            <Text id="headerEscenario" text="Esc."/>
+                            <Text id="headerEscenario" text="Escenario"/>
                         </Column>
                         
                         <Column id="colSociedad" width="7em">
@@ -166,11 +222,11 @@
                             <Text id="headerProveedor" text="Proveedor"/>
                         </Column>
                         
-                        <Column id="colNombre" width="14em">
+                        <Column id="colNombre" width="auto">
                             <Text id="headerNombre" text="Nombre"/>
                         </Column>
                         
-                        <Column id="colCondPago" width="7em">
+                        <Column id="colCondPago" width="auto">
                             <Text id="headerCondPago" text="Cond. pago"/>
                         </Column>
                         
@@ -178,7 +234,7 @@
                             <Text id="headerTipoDoc" text="Tipo doc."/>
                         </Column>
                         
-                        <Column id="colReferencia" width="14em">
+                        <Column id="colReferencia" width="20em">
                             <Text id="headerReferencia" text="Referencia"/>
                         </Column>
                         
@@ -191,7 +247,7 @@
                         </Column>
                         
                         <Column id="colFechaVencimiento" width="10em">
-                            <Text id="headerFechaVencim" text="Fecha vencim."/>
+                            <Text id="headerFechaVencim" text="Fecha vencimin."/>
                         </Column>
                         
                         <Column id="colFechaBase" width="10em">
@@ -224,8 +280,12 @@
                                 <HBox id="cellEstado" justifyContent="Center">
                                     <core:Icon 
                                         id="iconEstado"
-                                        src="{= ${facturas>estado} === 'Aprobada' ? 'sap-icon://accept' : 'sap-icon://warning' }"
-                                        color="{= ${facturas>estado} === 'Aprobada' ? '#2b7d2b' : '#e9730c' }"
+                                        src="{= ${facturas>estado} === 'Aprobada' ? 'sap-icon://accept' : 
+                                              ${facturas>estado} === 'Pendiente' ? 'sap-icon://pending' : 
+                                              ${facturas>estado} === 'Observada' ? 'sap-icon://warning' : 'sap-icon://status-inactive' }"
+                                        color="{= ${facturas>estado} === 'Aprobada' ? '#2b7d2b' : 
+                                               ${facturas>estado} === 'Pendiente' ? '#0070f0' : 
+                                               ${facturas>estado} === 'Observada' ? '#e9730c' : '#6a6d70' }"
                                         size="1.2rem"/>
                                 </HBox>
                                 
@@ -255,30 +315,22 @@
                 </smartTable:copyProvider>
                 
             </smartTable:SmartTable>
-        </ScrollContainer>
-        
-        <!-- Mensaje cuando no hay resultados -->
-        <VBox 
-            id="noResultsVBox"
-            visible="{= ${facturas>/totalFacturas} === 0 }"
-            alignItems="Center"
-            class="sapUiMediumMarginTop">
-            <core:Icon 
-                id="iconNoResults"
-                src="sap-icon://inbox"
-                size="4rem"
-                color="#999"
-                class="sapUiSmallMarginBottom"/>
-            <Text 
-                id="txtNoResults"
-                text="No se encontraron facturas con los criterios de búsqueda"
-                class="sapUiSmallMarginBottom"/>
-            <Button 
-                id="btnModificarFiltros"
-                text="Modificar Filtros"
-                press="onNavBack"
-                type="Emphasized"/>
-        </VBox>
-        
-    </VBox>
+            </ScrollContainer> 
+        </f:content>
+
+        <!-- DynamicPage Footer -->
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer/>
+                <Button 
+                    type="Emphasized" 
+                    text="Aplicar Filtros"
+                    press="onAplicarFiltros"/>
+                <Button 
+                    type="Reject" 
+                    text="Limpiar Selección"
+                    press="onLimpiarSeleccion"/>
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
 </mvc:View>

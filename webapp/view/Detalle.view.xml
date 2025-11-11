@@ -1,0 +1,119 @@
+<mvc:View
+    controllerName="monitorfactura.project1.controller.Detalle"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:plugins="sap.m.plugins"
+    displayBlock="true"
+    height="100%">
+    
+    <Page
+        id="detallePage"
+        title="Detalle de Factura"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        class="sapUiResponsiveContentPadding">
+        
+        <headerContent>
+            <Button
+                id="btnExportarDetalle"
+                text="Exportar"
+                icon="sap-icon://excel-attachment"
+                press="onExportarDetalle"/>
+        </headerContent>
+        
+        <!-- Contenedor para scroll horizontal -->
+        <ScrollContainer 
+            id="detalleScrollContainer"
+            height="100%"
+            width="100%"
+            vertical="true"
+            horizontal="true"
+            focusable="true">
+            
+            <!-- Smart Table para detalles -->
+            <smartTable:SmartTable 
+                id="smartTableDetalle"
+                entitySet="DetalleFactura"
+                enableExport="true"
+                beforeExport="onBeforeExportDetalle"
+                useVariantManagement="false"
+                useTablePersonalisation="true"
+                header="Detalles de Factura"
+                showRowCount="true"
+                persistencyKey="DetalleFacturaTable"
+                enableAutoBinding="false"
+                enableAutoColumnWidth="false">
+                
+                <smartTable:layoutData>
+                    <FlexItemData growFactor="1" baseSize="0%"/>
+                </smartTable:layoutData>
+                
+                <!-- Tabla interna -->
+                <Table 
+                    id="tablaDetalle"
+                    mode="None"
+                    items="{path: 'detalle>/items'}"
+                    fixedLayout="false"
+                    width="auto" >
+                    
+                    <columns>
+                        <Column width="8em">
+                            <Text text="Pos. Factura"/>
+                        </Column>
+                        <Column width="20em">
+                            <Text text="Descripción"/>
+                        </Column>
+                        <Column width="8em" hAlign="End">
+                            <Text text="Cantidad"/>
+                        </Column>
+                        <Column width="8em">
+                            <Text text="UMB"/>
+                        </Column>
+                        <Column width="10em" hAlign="End">
+                            <Text text="PU sin IGV"/>
+                        </Column>
+                        <Column width="10em" hAlign="End">
+                            <Text text="PU con IGV"/>
+                        </Column>
+                        <Column width="12em" hAlign="End">
+                            <Text text="Total con IGV"/>
+                        </Column>
+                    </columns>
+                    
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{detalle>posFactura}"/>
+                                <Text text="{detalle>descripcion}"/>
+                                <Text text="{detalle>cantidad}"/>
+                                <Text text="{detalle>umb}"/>
+                                <Text text="{detalle>puSinIGV}"/>
+                                <Text text="{detalle>puConIGV}"/>
+                                <Text text="{detalle>totalConIGV}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </smartTable:SmartTable>
+        </ScrollContainer>
+        
+        <!-- Mensaje cuando no hay detalles -->
+        <VBox 
+            id="noDetallesVBox"
+            visible="{= ${detalle>/totalItems} === 0 }"
+            alignItems="Center"
+            class="sapUiMediumMarginTop">
+            <core:Icon 
+                src="sap-icon://documents"
+                size="4rem"
+                color="#999"
+                class="sapUiSmallMarginBottom"/>
+            <Text 
+                text="No se encontraron detalles para esta factura"
+                class="sapUiSmallMarginBottom"/>
+        </VBox>
+        
+    </Page>
+</mvc:View>

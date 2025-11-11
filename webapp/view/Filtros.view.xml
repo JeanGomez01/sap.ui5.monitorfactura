@@ -35,7 +35,12 @@
                         id="sociedadInput"
                         placeholder="{i18n>seleccioneSociedad}"
                         width="150px"/>
-                    
+                      <Button 
+                id="buscarBtn2"
+                text="Ir"
+                type="Emphasized" 
+                width="50px"
+                press="onBuscar"/>
                     <!-- Fila 2: División -->
                     <Label text="{i18n>division}" id="divisionLabel"/>
                     <HBox id="hboxDivision" alignItems="Center">
@@ -129,8 +134,7 @@
         </VBox>
          
         <VBox id="tipoDocumentoBox" class="sapUiSmallMarginBottom">
-            <Title id="tipoDocumentoTitle" text="{i18n>tipoDocumento}" level="H2" class=""/>
-            
+       
             <VBox id="radioButtonContainer" class="sapUiSmallMargin">
                 <RadioButtonGroup 
                     id="tipoDocRadioGroup"
@@ -152,16 +156,6 @@
                 </RadioButtonGroup>
             </VBox>
         </VBox>
-         
-        <Toolbar id="botonesToolbar" class="sapUiMediumMarginTop">
-            <ToolbarSpacer id="toolbarSpacer"/>
-            <Button 
-                id="buscarBtn"
-                text="{i18n>buscar}"
-                type="Emphasized"
-                icon="sap-icon://search"
-                press="onBuscar"/>
-        </Toolbar>
-        
+      
     </VBox>
 </mvc:View>

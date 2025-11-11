@@ -1,0 +1,123 @@
+<mvc:View
+    controllerName="monitorfactura.project1.controller.DocsAsignados"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:plugins="sap.m.plugins"
+    displayBlock="true"
+    height="100%">
+    
+    <Page
+        id="docsAsignadosPage"
+        title="Documentos Asignados"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        class="sapUiResponsiveContentPadding">
+        
+        <headerContent>
+            <Button
+                id="btnExportarDocs"
+                text="Exportar"
+                icon="sap-icon://excel-attachment"
+                press="onExportarDocs"/>
+        </headerContent>
+        
+        <!-- Contenedor para scroll horizontal -->
+        <ScrollContainer 
+            id="docsScrollContainer"
+            height="100%"
+            width="100%"
+            vertical="true"
+            horizontal="true"
+            focusable="true">
+            
+            <!-- Smart Table para documentos asignados -->
+            <smartTable:SmartTable 
+                id="smartTableDocs"
+                entitySet="DocsAsignados"
+                enableExport="true"
+                beforeExport="onBeforeExportDocs"
+                useVariantManagement="false"
+                useTablePersonalisation="true"
+                header="Documentos Asignados"
+                showRowCount="true"
+                persistencyKey="DocsAsignadosTable"
+                enableAutoBinding="false"
+                enableAutoColumnWidth="false">
+                
+                <smartTable:layoutData>
+                    <FlexItemData growFactor="1" baseSize="0%"/>
+                </smartTable:layoutData>
+                
+                <!-- Tabla interna -->
+                <Table 
+                    id="tablaDocs"
+                    mode="None"
+                    items="{path: 'docs>/documentos'}"
+                    fixedLayout="false"
+                    width="auto" >
+                    
+                    <columns>
+                        <Column width="8em">
+                            <Text text="Pedido"/>
+                        </Column>
+                        <Column width="8em">
+                            <Text text="Pos Pedido"/>
+                        </Column>
+                        <Column width="10em">
+                            <Text text="Fecha Ingreso"/>
+                        </Column>
+                        <Column width="12em">
+                            <Text text="Guía Remisión"/>
+                        </Column>
+                        <Column width="12em">
+                            <Text text="Doc Material Posic."/>
+                        </Column>
+                        <Column width="20em">
+                            <Text text="Descripción"/>
+                        </Column>
+                        <Column width="12em" hAlign="End">
+                            <Text text="Cantidad Imp sin IGV"/>
+                        </Column>
+                        <Column width="8em">
+                            <Text text="Moneda"/>
+                        </Column>
+                    </columns>
+                    
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{docs>pedido}"/>
+                                <Text text="{docs>posPedido}"/>
+                                <Text text="{docs>fechaIngreso}"/>
+                                <Text text="{docs>guiaRemision}"/>
+                                <Text text="{docs>docMaterialPosic}"/>
+                                <Text text="{docs>descripcion}"/>
+                                <Text text="{docs>cantidadSinIGV}"/>
+                                <Text text="{docs>moneda}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </smartTable:SmartTable>
+        </ScrollContainer>
+        
+        <!-- Mensaje cuando no hay documentos -->
+        <VBox 
+            id="noDocsVBox"
+            visible="{= ${docs>/totalDocumentos} === 0 }"
+            alignItems="Center"
+            class="sapUiMediumMarginTop">
+            <core:Icon 
+                src="sap-icon://document"
+                size="4rem"
+                color="#999"
+                class="sapUiSmallMarginBottom"/>
+            <Text 
+                text="No se encontraron documentos asignados"
+                class="sapUiSmallMarginBottom"/>
+        </VBox>
+        
+    </Page>
+</mvc:View>

@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], (Controller, MessageToast, JSONModel, Filter, FilterOperator) => {
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageBox",
+], (Controller, MessageToast, JSONModel, Filter, FilterOperator, MessageBox) => {
     "use strict";
 
     return Controller.extend("monitorfactura.project1.controller.MainView", {
@@ -21,6 +22,14 @@ sap.ui.define([
                 totalFacturas: 0
             });
             this.getView().setModel(oLocalModel, "facturas");
+
+            const oMainViewModel = new JSONModel({
+                hasSelection: false,
+                selectedFactura: null,
+                tableWidth: "auto",
+                showScrollIndicator: true
+            });
+            this.getView().setModel(oMainViewModel, "mainView");
         },
 
         /**
@@ -32,14 +41,48 @@ sap.ui.define([
 
             if (oFiltrosModel) {
                 const oFiltros = oFiltrosModel.getData();
-                console.log("Filtros recibidos en MainView:", oFiltros);
 
                 this._mostrarFiltrosAplicados(oFiltros);
-
                 this._cargarDatos(oFiltros);
+
+                this._adjustTableWidth();
             } else {
                 MessageToast.show("No hay filtros aplicados");
             }
+        },
+
+        /**
+         * Ajustar el ancho de la tabla basado en el contenido
+         * @private
+         */
+        _adjustTableWidth() {
+            setTimeout(() => {
+                const oTable = this.byId("tablaFacturas");
+                if (oTable) {
+                    const aColumns = oTable.getColumns();
+                    let iTotalWidth = 0;
+
+                    aColumns.forEach((oColumn) => {
+                        iTotalWidth += this._getColumnWidth(oColumn);
+                    });
+                }
+            }, 500);
+        },
+
+        /**
+         * Obtener el ancho de una columna
+         * @private
+         * @param {sap.m.Column} oColumn - Columna
+         * @returns {number} Ancho en píxeles
+         */
+        _getColumnWidth(oColumn) {
+            const sWidth = oColumn.getWidth();
+            if (sWidth && sWidth.endsWith("em")) {
+                return parseInt(sWidth) * 16;
+            } else if (sWidth && sWidth.endsWith("px")) {
+                return parseInt(sWidth);
+            }
+            return 100;
         },
 
         /**
@@ -233,13 +276,12 @@ sap.ui.define([
             const aFacturas = oModel.getProperty("/facturas");
             const oMainViewModel = this.getView().getModel("mainView");
 
-            // Verificar si hay al menos un checkbox seleccionado
             const bHasSelection = aFacturas.some(oFactura => oFactura.selected === true);
 
-            // Obtener los registros seleccionados
             const aSelected = aFacturas.filter(oFactura => oFactura.selected === true);
 
             oMainViewModel.setProperty("/hasSelection", bHasSelection);
+            oMainViewModel.setProperty("/selectedCount", aSelected.length);
 
             if (aSelected.length === 1) {
                 oMainViewModel.setProperty("/selectedFactura", aSelected[0]);
@@ -251,11 +293,41 @@ sap.ui.define([
         },
 
         /**
+         * Actualizar datos
+         */
+        onActualizar() {
+            MessageToast.show("Actualizando datos...");
+            this._cargarDatos({});
+        },
+
+        /**
+         * Aplicar filtros
+         */
+        onAplicarFiltros() {
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteFiltros");
+        },
+
+        /**
+         * Limpiar selección
+         */
+        onLimpiarSeleccion() {
+            const oModel = this.getView().getModel("facturas");
+            const aFacturas = oModel.getProperty("/facturas");
+
+            aFacturas.forEach((oFactura, index) => {
+                oModel.setProperty(`/facturas/${index}/selected`, false);
+            });
+
+            this._updateSelectionState();
+            MessageToast.show("Selección limpiada");
+        },
+
+        /**
          * Manejar el evento beforeRebindTable del SmartTable
          * @param {sap.ui.base.Event} oEvent - Evento beforeRebindTable
          */
         onBeforeRebindTable(oEvent) {
-            // Aquí puedes manipular los binding parameters si es necesario
             const mBindingParams = oEvent.getParameter("bindingParams");
             console.log("Binding params antes del rebind:", mBindingParams);
         },
@@ -265,22 +337,69 @@ sap.ui.define([
          * @param {sap.ui.base.Event} oEvent - Evento beforeExport
          */
         onBeforeExport(oEvent) {
-            // Configurar opciones de exportación si es necesario
             const oExportSettings = oEvent.getParameter("exportSettings");
             console.log("Configuración de exportación:", oExportSettings);
         },
 
-        // Métodos de los botones (mantener los que ya tienes)
         onPosFactura() {
-            MessageToast.show("Pos. Factura - Función en desarrollo");
+            const oMainViewModel = this.getView().getModel("mainView");
+            const oSelectedFactura = oMainViewModel.getProperty("/selectedFactura");
+
+            if (!oSelectedFactura) {
+                MessageToast.show("Por favor, seleccione una factura primero");
+                return;
+            }
+
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteDetalle");
         },
 
         onDocsAsignados() {
-            MessageToast.show("Docs. Asignados - Función en desarrollo");
-        },
+            const oMainViewModel = this.getView().getModel("mainView");
+            const oSelectedFactura = oMainViewModel.getProperty("/selectedFactura");
 
-        onProRegistrar() {
-            MessageToast.show("Pro-Registrar - Función en desarrollo");
+            if (!oSelectedFactura) {
+                MessageToast.show("Por favor, seleccione una factura primero");
+                return;
+            }
+
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteDocsAsignados");
+        },
+        _procesarPreRegistro(aFacturas) {
+            const oFacturasModel = this.getView().getModel("facturas");
+            const aTodasFacturas = oFacturasModel.getProperty("/facturas");
+
+            aTodasFacturas.forEach((oFactura, index) => {
+                if (oFactura.selected) {
+                    oFacturasModel.setProperty(`/facturas/${index}/estado`, "Aprobada");
+                    oFacturasModel.setProperty(`/facturas/${index}/selected`, false);
+                }
+            });
+
+            this._updateSelectionState();
+        },
+        onPreRegistrar() {
+            const oMainViewModel = this.getView().getModel("mainView");
+            const oFacturasModel = this.getView().getModel("facturas");
+            const aFacturas = oFacturasModel.getProperty("/facturas");
+
+            const aSelectedFacturas = aFacturas.filter(oFactura => oFactura.selected === true);
+
+            if (aSelectedFacturas.length === 0) {
+                MessageToast.show("Por favor, seleccione al menos una factura para Pre-Registrar");
+                return;
+            }
+
+            MessageToast.show(`Procesando ${aSelectedFacturas.length} factura(s)...`);
+            oMainViewModel.setProperty("/processing", true);
+            setTimeout(() => {
+                this._procesarPreRegistro(aSelectedFacturas);
+                oMainViewModel.setProperty("/processing", false);
+
+                MessageBox.success("El pre-registro fue creado correctamente.");
+                return;
+            }, 2000);
         },
 
         onContabilizar() {
@@ -316,7 +435,6 @@ sap.ui.define([
             }
 
             MessageToast.show(`Exportando ${aFacturas.length} factura(s)...`);
-            console.log("Datos a exportar:", aFacturas);
         }
     });
 });

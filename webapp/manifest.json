@@ -33,7 +33,7 @@
     }
   },
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.142.0",
       "libs": {
@@ -86,6 +86,16 @@
           "target": [
             "TargetMainView"
           ]
+        },
+        {
+          "name": "RouteDetalle",
+          "pattern": "detalle",
+          "target": "targetDetalle"
+        },
+        {
+          "name": "RouteDocsAsignados",
+          "pattern": "docs-asignados",
+          "target": "targetDocsAsignados"
         }
       ],
       "targets": {
@@ -96,6 +106,20 @@
         "TargetMainView": {
           "id": "MainView",
           "name": "MainView"
+        },
+        "TargetDetalle": {
+          "id": "Detalle",
+          "name": "Detalle"
+        },
+        "targetDetalle": {
+          "viewName": "Detalle",
+          "viewId": "detalle",
+          "viewLevel": 2
+        },
+        "targetDocsAsignados": {
+          "viewName": "DocsAsignados",
+          "viewId": "docsAsignados",
+          "viewLevel": 2
         }
       }
     },
