@@ -74,14 +74,25 @@
       },
       "routes": [
         {
+          "name": "RouteFiltros",
+          "pattern": "",
+          "target": [
+            "TargetFiltros"
+          ]
+        },
+        {
           "name": "RouteMainView",
-          "pattern": ":?query:",
+          "pattern": "resultados",
           "target": [
             "TargetMainView"
           ]
         }
       ],
       "targets": {
+        "TargetFiltros": {
+          "id": "Filtros",
+          "name": "Filtros"
+        },
         "TargetMainView": {
           "id": "MainView",
           "name": "MainView"

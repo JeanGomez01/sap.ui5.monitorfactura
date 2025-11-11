@@ -1,6 +1,284 @@
-<mvc:View controllerName="monitorfactura.project1.controller.MainView"
+<mvc:View 
+    controllerName="monitorfactura.project1.controller.MainView"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-    </Page>
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:plugins="sap.m.plugins"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    displayBlock="true"
+    height="100%">
+    
+    <VBox id="mainContentVBox" fitContainer="true">
+                
+        <!-- Barra de Botones Superior con Iconos -->
+        <OverflowToolbar id="accionesToolbar" design="Solid">
+            <ToolbarSpacer id="spacerInicio"/>
+            
+            <Button 
+                id="btnPosFactura"
+                text="Pos.Factura"
+                icon="sap-icon://documents"
+                enabled="{mainView>/hasSelection}"
+                press="onPosFactura"/>
+            
+            <Button 
+                id="btnDocsAsignados"
+                text="Docs.asignados"
+                icon="sap-icon://document-text"
+                enabled="{mainView>/hasSelection}"
+                press="onDocsAsignados"/>
+            
+            <Button 
+                id="btnProRegistrar"
+                text="Pre-registrar"
+                icon="sap-icon://create-form"
+                enabled="{mainView>/hasSelection}"
+                press="onProRegistrar"/>
+            
+            <Button 
+                id="btnContabilizar"
+                text="Contabilizar"
+                icon="sap-icon://sales-order"
+                enabled="{mainView>/hasSelection}"
+                press="onContabilizar"/>
+            
+            <Button 
+                id="btnVerDocSAP"
+                text="Ver documento SAP"
+                icon="sap-icon://display"
+                enabled="{mainView>/hasSelection}"
+                press="onVerDocumentoSAP"/>
+            
+            <Button 
+                id="btnLogEjecucion"
+                text="Log de ejecución"
+                icon="sap-icon://log"
+                enabled="{mainView>/hasSelection}"
+                press="onVerLog"/>
+            
+            <Button 
+                id="btnFacturaObservada"
+                text="Factura observada"
+                icon="sap-icon://message-warning"
+                enabled="{mainView>/hasSelection}"
+                press="onFacturaObservada"/>
+            
+            <MenuButton 
+                id="btnMas"
+                text="Más"
+                icon="sap-icon://overflow"
+                enabled="{mainView>/hasSelection}">
+                <menu>
+                    <Menu id="menuMas">
+                        <items>
+                            <MenuItem id="menuItem1" text="Opción 1" press="onOpcionMas"/>
+                            <MenuItem id="menuItem2" text="Opción 2" press="onOpcionMas"/>
+                            <MenuItem id="menuItem3" text="Opción 3" press="onOpcionMas"/>
+                        </items>
+                    </Menu>
+                </menu>
+            </MenuButton>
+        </OverflowToolbar>
+        
+        <!-- Línea Separadora -->
+        <Toolbar id="separadorToolbar" height="2px">
+            <ToolbarSpacer id="spacerSeparador"/>
+        </Toolbar>
+         
+        <!-- Contenedor para el scroll horizontal -->
+        <ScrollContainer 
+            id="tableScrollContainer"
+            height="100%"
+            width="100%"
+            vertical="true"
+            horizontal="true"
+            focusable="true">
+            
+            <!-- Smart Table Principal con scroll -->
+            <smartTable:SmartTable 
+                id="smartTableFacturas"
+                entitySet="Facturas"
+                smartFilterId=""
+                enableExport="true"
+                beforeExport="onBeforeExport"
+                useVariantManagement="false"
+                useTablePersonalisation="true"
+                header="Facturas"
+                showRowCount="true"
+                persistencyKey="MonitorFacturasTable"
+                enableAutoBinding="false"
+                enableAutoColumnWidth="true" 
+                class="sapUiResponsiveContentPadding scrollableTable"
+                beforeRebindTable="onBeforeRebindTable"
+                app:preserveDecimals="false">
+                
+                <smartTable:layoutData>
+                    <FlexItemData id="flexItemData" growFactor="1" baseSize="0%"/>
+                </smartTable:layoutData>
+                
+                <smartTable:customToolbar>
+                    <OverflowToolbar id="customToolbar" design="Transparent">
+                        <ToolbarSpacer id="toolbarSpacer2"/>
+                    </OverflowToolbar>
+                </smartTable:customToolbar>
+                
+                <!-- Tabla interna con scroll horizontal -->
+                <Table 
+                    id="tablaFacturas"
+                    mode="SingleSelectMaster"
+                    selectionChange="onSelectionChange"
+                    items="{path: 'facturas>/facturas'}"
+                    fixedLayout="false"  
+                    width="auto"
+                > 
+                    
+                    <columns>
+                        <!-- Checkbox de Selección -->
+                        <Column id="colCheckbox" width="3em" hAlign="Center">
+                            <CheckBox 
+                                id="headerCheckbox"
+                                select="onSelectAll"/>
+                        </Column>
+                        
+                        <!-- Estado -->
+                        <Column id="colEstado" width="4em" hAlign="Center">
+                            <Text id="headerEstado" text="Estado"/>
+                        </Column>
+                        
+                        <Column id="colEscenario" width="4em">
+                            <Text id="headerEscenario" text="Esc."/>
+                        </Column>
+                        
+                        <Column id="colSociedad" width="7em">
+                            <Text id="headerSociedad" text="Sociedad"/>
+                        </Column>
+                        
+                        <Column id="colCodigo" width="7em">
+                            <Text id="headerCodigo" text="Código"/>
+                        </Column>
+                        
+                        <Column id="colRucProveedor" width="10em">
+                            <Text id="headerRucProveedor" text="RUC proveedor"/>
+                        </Column>
+                        
+                        <Column id="colProveedor" width="10em">
+                            <Text id="headerProveedor" text="Proveedor"/>
+                        </Column>
+                        
+                        <Column id="colNombre" width="14em">
+                            <Text id="headerNombre" text="Nombre"/>
+                        </Column>
+                        
+                        <Column id="colCondPago" width="7em">
+                            <Text id="headerCondPago" text="Cond. pago"/>
+                        </Column>
+                        
+                        <Column id="colTipoDoc" width="7em">
+                            <Text id="headerTipoDoc" text="Tipo doc."/>
+                        </Column>
+                        
+                        <Column id="colReferencia" width="14em">
+                            <Text id="headerReferencia" text="Referencia"/>
+                        </Column>
+                        
+                        <Column id="colFechaEmision" width="10em">
+                            <Text id="headerFechaEmision" text="Fecha Emisi."/>
+                        </Column>
+                        
+                        <Column id="colFechaRegistro" width="10em">
+                            <Text id="headerFechaRegistro" text="Fecha regist."/>
+                        </Column>
+                        
+                        <Column id="colFechaVencimiento" width="10em">
+                            <Text id="headerFechaVencim" text="Fecha vencim."/>
+                        </Column>
+                        
+                        <Column id="colFechaBase" width="10em">
+                            <Text id="headerFechaBase" text="Fecha Base"/>
+                        </Column>
+                        
+                        <Column id="colFechaContable" width="10em">
+                            <Text id="headerFechaContable" text="Fecha Contable"/>
+                        </Column>
+                        
+                        <Column id="colNumDocLogistico" width="12em">
+                            <Text id="headerNumDocLog" text="N° Doc. logístico"/>
+                        </Column>
+                        
+                        <Column id="colEjercicio" width="7em">
+                            <Text id="headerEjercicio" text="Ejercicio"/>
+                        </Column>
+                    </columns>
+                    
+                    <items>
+                        <ColumnListItem id="itemTemplate" type="Active">
+                            <cells>
+                                <!-- Checkbox Individual -->
+                                <CheckBox 
+                                    id="itemCheckbox"
+                                    selected="{facturas>selected}"
+                                    select="onCheckboxSelect"/>
+                                
+                                <!-- Estado: Check verde o círculo amarillo -->
+                                <HBox id="cellEstado" justifyContent="Center">
+                                    <core:Icon 
+                                        id="iconEstado"
+                                        src="{= ${facturas>estado} === 'Aprobada' ? 'sap-icon://accept' : 'sap-icon://warning' }"
+                                        color="{= ${facturas>estado} === 'Aprobada' ? '#2b7d2b' : '#e9730c' }"
+                                        size="1.2rem"/>
+                                </HBox>
+                                
+                                <Text id="cellEscenario" text="{facturas>escenario}"/>
+                                <Text id="cellSociedad" text="{facturas>sociedad}"/>
+                                <Text id="cellCodigo" text="{facturas>codigo}"/>
+                                <Text id="cellRucProveedor" text="{facturas>rucProveedor}"/>
+                                <Text id="cellProveedor" text="{facturas>proveedor}"/>
+                                <Text id="cellNombre" text="{facturas>nombre}"/>
+                                <Text id="cellCondPago" text="{facturas>condPago}"/>
+                                <Text id="cellTipoDoc" text="{facturas>tipoDoc}"/>
+                                <Text id="cellReferencia" text="{facturas>referencia}"/>
+                                <Text id="cellFechaEmision" text="{facturas>fechaEmision}"/>
+                                <Text id="cellFechaRegistro" text="{facturas>fechaRegistro}"/>
+                                <Text id="cellFechaVencimiento" text="{facturas>fechaVencimiento}"/>
+                                <Text id="cellFechaBase" text="{facturas>fechaBase}"/>
+                                <Text id="cellFechaContable" text="{facturas>fechaContable}"/>
+                                <Text id="cellNumDocLogistico" text="{facturas>numeroDocLogistico}"/>
+                                <Text id="cellEjercicio" text="{facturas>ejercicio}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+                
+                <smartTable:copyProvider>
+                    <plugins:CopyProvider id="copyProvider"/>
+                </smartTable:copyProvider>
+                
+            </smartTable:SmartTable>
+        </ScrollContainer>
+        
+        <!-- Mensaje cuando no hay resultados -->
+        <VBox 
+            id="noResultsVBox"
+            visible="{= ${facturas>/totalFacturas} === 0 }"
+            alignItems="Center"
+            class="sapUiMediumMarginTop">
+            <core:Icon 
+                id="iconNoResults"
+                src="sap-icon://inbox"
+                size="4rem"
+                color="#999"
+                class="sapUiSmallMarginBottom"/>
+            <Text 
+                id="txtNoResults"
+                text="No se encontraron facturas con los criterios de búsqueda"
+                class="sapUiSmallMarginBottom"/>
+            <Button 
+                id="btnModificarFiltros"
+                text="Modificar Filtros"
+                press="onNavBack"
+                type="Emphasized"/>
+        </VBox>
+        
+    </VBox>
 </mvc:View>

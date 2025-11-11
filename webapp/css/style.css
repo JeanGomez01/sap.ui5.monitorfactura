@@ -1,1 +1,4 @@
-/* Enter your custom styles here */
+ .scrollableTable {
+    overflow-x: auto;
+    overflow-y: auto;
+}

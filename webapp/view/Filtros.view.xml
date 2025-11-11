@@ -1,0 +1,167 @@
+<mvc:View 
+    controllerName="monitorfactura.project1.controller.Filtros"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+    
+    <VBox id="mainContainer" class="sapUiMediumMargin">
+         
+        <VBox id="filtrosPrincipalesBox" class="sapUiSmallMarginBottom"> 
+            <f:SimpleForm
+                id="filtrosForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="1"
+                emptySpanL="1"
+                emptySpanM="1"
+                emptySpanS="0"
+                columnsXL="2"
+                columnsL="2"
+                columnsM="2"
+                singleContainerFullSize="false"
+                class="sapUiResponsiveMargin">
+                
+                <f:content>
+                    <!-- Fila 1: Sociedad sola ocupando toda la fila -->
+                    <Label text="{i18n>sociedad}" required="true" id="sociedadLabel"/>
+                    <Input 
+                        id="sociedadInput"
+                        placeholder="{i18n>seleccioneSociedad}"
+                        width="150px"/>
+                    
+                    <!-- Fila 2: División -->
+                    <Label text="{i18n>division}" id="divisionLabel"/>
+                    <HBox id="hboxDivision" alignItems="Center">
+                        <Input 
+                            id="divisionInputDe"
+                            placeholder="{i18n>divisionDesde}"
+                            width="150px"
+                            class="sapUiSmallMarginEnd"/>
+                        <Text text="{i18n>divisionA}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" id="textDivisionA"/>
+                        <Input 
+                            id="divisionInputHasta"
+                            placeholder="{i18n>divisionHasta}"
+                            width="150px"/>
+                    </HBox>
+                    
+                    <!-- Fila 3: Proveedor -->
+                    <Label text="{i18n>proveedor}" id="proveedorLabel"/>
+                    <HBox id="hboxProveedor" alignItems="Center">
+                        <Input 
+                            id="proveedorInputDe"
+                            placeholder="{i18n>proveedorDesde}"
+                            width="150px"
+                            class="sapUiSmallMarginEnd"/>
+                        <Text text="{i18n>proveedorA}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" id="textProveedorA"/>
+                        <Input 
+                            id="proveedorInputHasta"
+                            placeholder="{i18n>proveedorHasta}"
+                            width="150px"/>
+                    </HBox>
+                    
+                    <!-- Fila 4: Fecha Registro -->
+                    <Label text="{i18n>fechaRegistro}" id="fechaRegistroLabel"/>
+                    <HBox id="hbox1" alignItems="Center">
+                        <DatePicker 
+                            id="fechaRegistroDe"
+                            placeholder="{i18n>fechaDesde}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"
+                            class="sapUiSmallMarginEnd"/>
+                        <Text text="{i18n>fechaRegistroA}" id="textFechaRegistroA" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+                        <DatePicker 
+                            id="fechaRegistroHasta"
+                            placeholder="{i18n>fechaHasta}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"/>
+                    </HBox>
+                    
+                    <!-- Fila 5: Fecha Emisión -->
+                    <Label text="{i18n>fechaEmision}" id="fechaEmisionLabel"/>
+                    <HBox id="hbox2" alignItems="Center">
+                        <DatePicker 
+                            id="fechaEmisionDe"
+                            placeholder="{i18n>fechaDesde}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"
+                            class="sapUiSmallMarginEnd"/>
+                        <Text text="{i18n>fechaEmisionA}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" id="textFechaEmisionA"/>
+                        <DatePicker 
+                            id="fechaEmisionHasta"
+                            placeholder="{i18n>fechaHasta}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"/>
+                    </HBox>
+                    
+                    <!-- Fila 6: Fecha Vencimiento -->
+                    <Label text="{i18n>fechaVencimiento}" id="fechaVencimientoLabel"/>
+                    <HBox id="hbox3" alignItems="Center">
+                        <DatePicker 
+                            id="fechaVencimientoDe"
+                            placeholder="{i18n>fechaDesde}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"
+                            class="sapUiSmallMarginEnd"/> 
+                        <Text text="{i18n>fechaVencimientoA}" class="sapUiSmallMarginBegin sapUiSmallMarginEnd" id="textFechaVencimientoA"/>
+                        <DatePicker 
+                            id="fechaVencimientoHasta"
+                            placeholder="{i18n>fechaHasta}"
+                            width="150px"
+                            displayFormat="dd/MM/yyyy"/>
+                    </HBox>
+                    
+                    <!-- Fila 7: Estado -->
+                    <Label text="{i18n>estado}" id="estadoLabel"/>
+                    <Input 
+                        id="estadoInput"
+                        placeholder="{i18n>seleccioneEstado}"
+                        width="150px"/>
+                    
+                </f:content>
+            </f:SimpleForm>
+        </VBox>
+         
+        <VBox id="tipoDocumentoBox" class="sapUiSmallMarginBottom">
+            <Title id="tipoDocumentoTitle" text="{i18n>tipoDocumento}" level="H2" class=""/>
+            
+            <VBox id="radioButtonContainer" class="sapUiSmallMargin">
+                <RadioButtonGroup 
+                    id="tipoDocRadioGroup"
+                    columns="1"
+                    width="100%">
+                    <RadioButton 
+                        id="rbFacturaSuministro"
+                        text="{i18n>facturaSuministro}"
+                        selected="true"/>
+                    <RadioButton 
+                        id="rbFacturaServicios"
+                        text="{i18n>facturaServicios}"/>
+                    <RadioButton 
+                        id="rbSinReferencia"
+                        text="{i18n>sinReferencia}"/>
+                    <RadioButton 
+                        id="rbNotaCredito"
+                        text="{i18n>notaCredito}"/>
+                </RadioButtonGroup>
+            </VBox>
+        </VBox>
+         
+        <Toolbar id="botonesToolbar" class="sapUiMediumMarginTop">
+            <ToolbarSpacer id="toolbarSpacer"/>
+            <Button 
+                id="buscarBtn"
+                text="{i18n>buscar}"
+                type="Emphasized"
+                icon="sap-icon://search"
+                press="onBuscar"/>
+        </Toolbar>
+        
+    </VBox>
+</mvc:View>
