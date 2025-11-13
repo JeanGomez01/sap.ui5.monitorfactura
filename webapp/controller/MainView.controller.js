@@ -27,7 +27,8 @@ sap.ui.define([
                 hasSelection: false,
                 selectedFactura: null,
                 tableWidth: "auto",
-                showScrollIndicator: true
+                showScrollIndicator: true,
+                mostrarContabilizar: true
             });
             this.getView().setModel(oMainViewModel, "mainView");
         },
@@ -44,6 +45,11 @@ sap.ui.define([
 
                 this._mostrarFiltrosAplicados(oFiltros);
                 this._cargarDatos(oFiltros);
+                
+                // Controlar visibilidad del botón Contabilizar según tipo de documento
+                const oMainViewModel = this.getView().getModel("mainView");
+                const bMostrarContabilizar = oFiltros.tipoDocumento !== "SinReferencia";
+                oMainViewModel.setProperty("/mostrarContabilizar", bMostrarContabilizar);
 
                 this._adjustTableWidth();
             } else {
@@ -391,19 +397,78 @@ sap.ui.define([
                 return;
             }
 
+            // Mostrar diálogo de confirmación con los datos
+            this._showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel);
+        },
+
+        /**
+         * Mostrar diálogo de confirmación para pre-registro
+         * @private
+         * @param {Array} aSelectedFacturas - Facturas seleccionadas
+         * @param {sap.ui.model.json.JSONModel} oMainViewModel - Modelo de vista principal
+         */
+        _showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel) {
+            let sMessage = `Confirme el pre-registro de ${aSelectedFacturas.length} factura(s):\n\n`;
+            
+            aSelectedFacturas.forEach((oFactura, index) => {
+                sMessage += `Factura Nro ${index + 1}:\n`;
+          
+                sMessage += `Fecha Contable: ${oFactura.fechaContable}\n`;
+                sMessage += `Fecha Base: ${oFactura.fechaBase}\n`;
+                sMessage += `Glosa de factura: ${oFactura.nombre}\n\n`;
+            });
+
+            MessageBox.confirm(sMessage, {
+                title: "Confirmación de Pre-Registro",
+                onClose: (oAction) => {
+                    if (oAction === MessageBox.Action.OK) {
+                        this._ejecutarPreRegistro(aSelectedFacturas, oMainViewModel);
+                    }
+                },
+                styleClass: "sapUiSizeCompact",
+                contentWidth: "500px"
+            });
+        },
+
+        /**
+         * Ejecutar el pre-registro después de la confirmación
+         * @private
+         * @param {Array} aSelectedFacturas - Facturas seleccionadas
+         * @param {sap.ui.model.json.JSONModel} oMainViewModel - Modelo de vista principal
+         */
+        _ejecutarPreRegistro(aSelectedFacturas, oMainViewModel) {
+            MessageToast.show(`Procesando ${aSelectedFacturas.length} factura(s)...`);
+            oMainViewModel.setProperty("/processing", true);
+            
+            setTimeout(() => {
+                this._procesarPreRegistro(aSelectedFacturas);
+                oMainViewModel.setProperty("/processing", false);
+
+                MessageBox.success("El pre-registro fue creado correctamente.");
+            }, 2000);
+        },
+
+        onContabilizar() {
+            const oMainViewModel = this.getView().getModel("mainView");
+            const oFacturasModel = this.getView().getModel("facturas");
+            const aFacturas = oFacturasModel.getProperty("/facturas");
+
+            const aSelectedFacturas = aFacturas.filter(oFactura => oFactura.selected === true);
+
+            if (aSelectedFacturas.length === 0) {
+                MessageToast.show("Por favor, seleccione al menos una factura para Contabilizar");
+                return;
+            }
+
             MessageToast.show(`Procesando ${aSelectedFacturas.length} factura(s)...`);
             oMainViewModel.setProperty("/processing", true);
             setTimeout(() => {
                 this._procesarPreRegistro(aSelectedFacturas);
                 oMainViewModel.setProperty("/processing", false);
 
-                MessageBox.success("El pre-registro fue creado correctamente.");
+                MessageBox.success("La contabilización se realizó correctamente.");
                 return;
             }, 2000);
-        },
-
-        onContabilizar() {
-            MessageToast.show("Contabilizar - Función en desarrollo");
         },
 
         onVerDocumentoSAP() {
@@ -411,7 +476,37 @@ sap.ui.define([
         },
 
         onVerLog() {
-            MessageToast.show("Log de Ejecución - Función en desarrollo");
+            const oMainViewModel = this.getView().getModel("mainView");
+            const oSelectedFactura = oMainViewModel.getProperty("/selectedFactura");
+
+            if (!oSelectedFactura) {
+                MessageToast.show("Por favor, seleccione una factura primero");
+                return;
+            }
+
+            // Simular log del último registro ejecutado
+            const sLogMessage = this._getLogMessage(oSelectedFactura);
+
+            MessageBox.information(sLogMessage, {
+                title: "Log de Ejecución",
+                contentWidth: "500px",
+                styleClass: "sapUiSizeCompact"
+            });
+        },
+
+        /**
+         * Obtener el mensaje de log del último registro ejecutado
+         * @private
+         * @param {object} oFactura - Factura seleccionada
+         * @returns {string} Mensaje de log
+         */
+        _getLogMessage(oFactura) {
+            let sLog = `Detalle del último registro ejecutado:\n\n`;
+            sLog += `Referencia: ${oFactura.referencia}\n`;
+            sLog += `Estado: ${oFactura.estado}\n`;
+            sLog += `Fecha de registro: ${oFactura.fechaRegistro}\n\n`;
+              
+            return sLog;
         },
 
         onFacturaObservada() {

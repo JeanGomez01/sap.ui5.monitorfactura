@@ -98,22 +98,6 @@
                 </Table>
             </smartTable:SmartTable>
         </ScrollContainer>
-        
-        <!-- Mensaje cuando no hay detalles -->
-        <VBox 
-            id="noDetallesVBox"
-            visible="{= ${detalle>/totalItems} === 0 }"
-            alignItems="Center"
-            class="sapUiMediumMarginTop">
-            <core:Icon 
-                src="sap-icon://documents"
-                size="4rem"
-                color="#999"
-                class="sapUiSmallMarginBottom"/>
-            <Text 
-                text="No se encontraron detalles para esta factura"
-                class="sapUiSmallMarginBottom"/>
-        </VBox>
-        
+         
     </Page>
 </mvc:View>
