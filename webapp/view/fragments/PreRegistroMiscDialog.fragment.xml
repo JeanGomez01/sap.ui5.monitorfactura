@@ -1,0 +1,137 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+    
+    <Dialog
+        id="preRegistroMiscDialog"
+        title="Pre-Registro de Factura Miscelánea"
+        contentWidth="90%"
+        contentHeight="70%"
+        resizable="true"
+        draggable="true">
+        
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <!-- Información de la Factura -->
+                <VBox class="sapUiSmallMarginBottom">
+                    <HBox class="sapUiTinyMarginBottom">
+                        <VBox class="sapUiSmallMarginEnd" width="25%">
+                            <Label text="Fecha Contable" id="lblFechaContable"/>
+                            <Text text="{preRegistroMisc>/fechaContable}" id="txtFechaContable"/>
+                        </VBox>
+                        <VBox class="sapUiSmallMarginEnd" width="25%">
+                            <Label text="Fecha Base" id="lblFechaBase"/>
+                            <Text text="{preRegistroMisc>/fechaBase}" id="txtFechaBase"/>
+                        </VBox>
+                        <VBox class="sapUiSmallMarginEnd" width="25%">
+                            <Label text="Glosa de Factura" id="lblGlosa"/>
+                            <Text text="{preRegistroMisc>/glosa}" id="txtGlosa"/>
+                        </VBox>
+                        <VBox width="25%">
+                            <Label text="Referencia" id="lblReferencia"/>
+                            <Text text="{preRegistroMisc>/referencia}" id="txtReferencia"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <Toolbar id="tableToolbar">
+                    <Title text="Posiciones de Factura" id="tableTitlePosFact" level="H2"/>
+                    <ToolbarSpacer id="toolbarSpacer"/>
+                    <Button
+                        id="btnAgregarPosicion"
+                        text="Agregar Posición"
+                        icon="sap-icon://add"
+                        press="onAgregarPosicion"/>
+                </Toolbar>
+                
+                <!-- Tabla de Posiciones -->
+                <Table
+                    id="tablaPosiciones"
+                    items="{preRegistroMisc>/posiciones}"
+                    mode="None"
+                    class="sapUiSizeCompact">
+                    
+                    <columns>
+                        <Column width="4em" id="colPos">
+                            <Text text="Pos." id="headerPos"/>
+                        </Column>
+                        <Column width="8em" id="colCodServicio">
+                            <Text text="Código Servicio" id="headerCodServicio"/>
+                        </Column>
+                        <Column width="12em" id="colDescripcion">
+                            <Text text="Descripción" id="headerDescripcion"/>
+                        </Column>
+                        <Column width="6em" id="colCantidad" hAlign="End">
+                            <Text text="Cantidad" id="headerCantidad"/>
+                        </Column>
+                        <Column width="5em" id="colUPM">
+                            <Text text="UPM" id="headerUPM"/>
+                        </Column>
+                        <Column width="7em" id="colPUSinIGV" hAlign="End">
+                            <Text text="PU sin IGV" id="headerPUSinIGV"/>
+                        </Column>
+                        <Column width="7em" id="colPUConIGV" hAlign="End">
+                            <Text text="PU con IGV" id="headerPUConIGV"/>
+                        </Column>
+                        <Column width="8em" id="colTotalConIGV" hAlign="End">
+                            <Text text="Total con IGV" id="headerTotalConIGV"/>
+                        </Column>
+                        <Column width="10em" id="colCuentaContable">
+                            <Text text="Cuenta Contable" id="headerCuentaContable"/>
+                        </Column>
+                        <Column width="10em" id="colCentroCosto">
+                            <Text text="Centro de Costo" id="headerCentroCosto"/>
+                        </Column>
+                        <Column width="4em" id="colAcciones">
+                            <Text text="" id="headerAcciones"/>
+                        </Column>
+                    </columns>
+                    
+                    <items>
+                        <ColumnListItem id="itemPosicion">
+                            <cells>
+                                <Text text="{preRegistroMisc>posicion}" id="cellPos"/>
+                                <Text text="{preRegistroMisc>codigoServicio}" id="cellCodServicio"/>
+                                <Text text="{preRegistroMisc>descripcion}" id="cellDescripcion"/>
+                                <Text text="{preRegistroMisc>cantidad}" id="cellCantidad"/>
+                                <Text text="{preRegistroMisc>upm}" id="cellUPM"/>
+                                <Text text="{preRegistroMisc>puSinIGV}" id="cellPUSinIGV"/>
+                                <Text text="{preRegistroMisc>puConIGV}" id="cellPUConIGV"/>
+                                <Text text="{preRegistroMisc>totalConIGV}" id="cellTotalConIGV"/>
+                                <Input 
+                                    value="{preRegistroMisc>cuentaContable}"
+                                    id="inputCuentaContable"
+                                    required="true"/>
+                                <Input 
+                                    value="{preRegistroMisc>centroCosto}"
+                                    id="inputCentroCosto"
+                                    required="true"/>
+                                <Button
+                                    icon="sap-icon://delete"
+                                    type="Reject"
+                                    press="onEliminarPosicion"
+                                    id="btnEliminar"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+        
+        <beginButton>
+            <Button
+                id="btnAceptarPreRegistro"
+                text="Aceptar"
+                type="Emphasized"
+                press="onAceptarPreRegistroMisc"/>
+        </beginButton>
+        
+        <endButton>
+            <Button
+                id="btnCancelarPreRegistro"
+                text="Cancelar"
+                press="onCancelarPreRegistroMisc"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

@@ -48,7 +48,7 @@
                                 state="Success"/>
                         </GenericTag>
                         <ToolbarSpacer/>
-                        <Text text="Seleccionadas: {mainView>/selectedCount}"/>
+                 
                     </OverflowToolbar>
                 </f:content>
                 

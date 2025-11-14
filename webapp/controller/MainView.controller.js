@@ -389,6 +389,8 @@ sap.ui.define([
             const oMainViewModel = this.getView().getModel("mainView");
             const oFacturasModel = this.getView().getModel("facturas");
             const aFacturas = oFacturasModel.getProperty("/facturas");
+            const oFiltrosModel = this.getOwnerComponent().getModel("filtros");
+            const oFiltros = oFiltrosModel ? oFiltrosModel.getData() : {};
 
             const aSelectedFacturas = aFacturas.filter(oFactura => oFactura.selected === true);
 
@@ -397,8 +399,53 @@ sap.ui.define([
                 return;
             }
 
-            // Mostrar diálogo de confirmación con los datos
-            this._showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel);
+            // Verificar si es factura sin referencia (miscelánea)
+            if (oFiltros.tipoDocumento === "SinReferencia") {
+                this._showPreRegistroMiscDialog(aSelectedFacturas[0]);
+            } else {
+                // Mostrar diálogo de confirmación normal
+                this._showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel);
+            }
+        },
+
+        /**
+         * Mostrar diálogo de pre-registro para facturas misceláneas
+         * @private
+         * @param {object} oFactura - Factura seleccionada
+         */
+        _showPreRegistroMiscDialog(oFactura) {
+            if (!this._oPreRegistroMiscDialog) {
+                this._oPreRegistroMiscDialog = sap.ui.xmlfragment(
+                    "monitorfactura.project1.view.fragments.PreRegistroMiscDialog",
+                    this
+                );
+                this.getView().addDependent(this._oPreRegistroMiscDialog);
+            }
+
+            // Crear modelo con datos iniciales
+            const oMiscModel = new JSONModel({
+                fechaContable: oFactura.fechaContable,
+                fechaBase: oFactura.fechaBase,
+                glosa: oFactura.nombre,
+                referencia: oFactura.referencia,
+                posiciones: [
+                    {
+                        posicion: 1,
+                        codigoServicio: "",
+                        descripcion: "",
+                        cantidad: 1,
+                        upm: "UN",
+                        puSinIGV: 0,
+                        puConIGV: 0,
+                        totalConIGV: 0,
+                        cuentaContable: "",
+                        centroCosto: ""
+                    }
+                ]
+            });
+
+            this.getView().setModel(oMiscModel, "preRegistroMisc");
+            this._oPreRegistroMiscDialog.open();
         },
 
         /**
@@ -515,6 +562,120 @@ sap.ui.define([
 
         onOpcionMas() {
             MessageToast.show("Opción Más - Función en desarrollo");
+        },
+
+        /**
+         * Calcular total con IGV cuando cambian cantidad o precio
+         * @param {sap.ui.base.Event} oEvent - Evento de cambio
+         */
+        onCalcularTotal(oEvent) {
+            const oInput = oEvent.getSource();
+            const oContext = oInput.getBindingContext("preRegistroMisc");
+            const oMiscModel = this.getView().getModel("preRegistroMisc");
+            const oPosicion = oContext.getObject();
+
+            const fCantidad = parseFloat(oPosicion.cantidad) || 0;
+            const fPUConIGV = parseFloat(oPosicion.puConIGV) || 0;
+            const fTotal = fCantidad * fPUConIGV;
+
+            oMiscModel.setProperty(oContext.getPath() + "/totalConIGV", fTotal.toFixed(2));
+        },
+
+        /**
+         * Agregar nueva posición a la tabla de misceláneas
+         */
+        onAgregarPosicion() {
+            const oMiscModel = this.getView().getModel("preRegistroMisc");
+            const aPosiciones = oMiscModel.getProperty("/posiciones");
+            const iNewPos = aPosiciones.length + 1;
+
+            aPosiciones.push({
+                posicion: iNewPos,
+                codigoServicio: "",
+                descripcion: "",
+                cantidad: 1,
+                upm: "UN",
+                puSinIGV: 0,
+                puConIGV: 0,
+                totalConIGV: 0,
+                cuentaContable: "",
+                centroCosto: ""
+            });
+
+            oMiscModel.setProperty("/posiciones", aPosiciones);
+        },
+
+        /**
+         * Eliminar posición de la tabla
+         * @param {sap.ui.base.Event} oEvent - Evento del botón
+         */
+        onEliminarPosicion(oEvent) {
+            const oMiscModel = this.getView().getModel("preRegistroMisc");
+            const aPosiciones = oMiscModel.getProperty("/posiciones");
+            const oContext = oEvent.getSource().getBindingContext("preRegistroMisc");
+            const iIndex = oContext.getPath().split("/").pop();
+
+            if (aPosiciones.length > 1) {
+                aPosiciones.splice(iIndex, 1);
+                // Reordenar posiciones
+                aPosiciones.forEach((oPos, index) => {
+                    oPos.posicion = index + 1;
+                });
+                oMiscModel.setProperty("/posiciones", aPosiciones);
+            } else {
+                MessageToast.show("Debe mantener al menos una posición");
+            }
+        },
+
+        /**
+         * Aceptar pre-registro de factura miscelánea
+         */
+        onAceptarPreRegistroMisc() {
+            const oMiscModel = this.getView().getModel("preRegistroMisc");
+            const aPosiciones = oMiscModel.getProperty("/posiciones");
+
+            // Validar que todas las posiciones tengan cuenta contable y centro de costo
+            let bValid = true;
+            aPosiciones.forEach((oPos) => {
+                if (!oPos.cuentaContable || !oPos.centroCosto) {
+                    bValid = false;
+                }
+            });
+
+            if (!bValid) {
+                MessageBox.warning("Por favor, complete la Cuenta Contable y Centro de Costo en todas las posiciones.");
+                return;
+            }
+
+            // Simular procesamiento
+            const oMainViewModel = this.getView().getModel("mainView");
+            oMainViewModel.setProperty("/processing", true);
+
+            setTimeout(() => {
+                this._oPreRegistroMiscDialog.close();
+                oMainViewModel.setProperty("/processing", false);
+
+                // Actualizar estado de la factura
+                const oFacturasModel = this.getView().getModel("facturas");
+                const aFacturas = oFacturasModel.getProperty("/facturas");
+                aFacturas.forEach((oFactura, index) => {
+                    if (oFactura.selected) {
+                        oFacturasModel.setProperty(`/facturas/${index}/estado`, "Aprobada");
+                        oFacturasModel.setProperty(`/facturas/${index}/selected`, false);
+                    }
+                });
+
+                this._updateSelectionState();
+
+                MessageBox.success("El documento fue registrado correctamente.");
+            }, 2000);
+        },
+
+        /**
+         * Cancelar pre-registro de factura miscelánea
+         */
+        onCancelarPreRegistroMisc() {
+            this._oPreRegistroMiscDialog.close();
         },
 
         /**
