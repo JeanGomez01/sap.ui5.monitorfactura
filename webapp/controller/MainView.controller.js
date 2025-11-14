@@ -587,8 +587,8 @@ sap.ui.define([
             const sTipoDocumento = this._getTipoDocumentoSeleccionado();
             const aSelectedFacturas = aFacturas.filter(oFactura => oFactura.selected === true);
 
-            if (aSelectedFacturas.length === 0) {
-                MessageToast.show("Por favor, seleccione al menos una factura para Pre-Registrar");
+            if (aSelectedFacturas.length !== 1) {
+                MessageToast.show("Por favor, seleccione una factura para Pre-Registrar");
                 return;
             }
 
