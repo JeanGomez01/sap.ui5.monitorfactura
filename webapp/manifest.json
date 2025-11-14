@@ -72,14 +72,7 @@
         "async": true,
         "viewPath": "monitorfactura.project1.view"
       },
-      "routes": [
-        {
-          "name": "RouteFiltros",
-          "pattern": "",
-          "target": [
-            "TargetFiltros"
-          ]
-        },
+      "routes": [ 
         {
           "name": "RouteMainView",
           "pattern": "resultados",
@@ -98,11 +91,7 @@
           "target": "targetDocsAsignados"
         }
       ],
-      "targets": {
-        "TargetFiltros": {
-          "id": "Filtros",
-          "name": "Filtros"
-        },
+      "targets": { 
         "TargetMainView": {
           "id": "MainView",
           "name": "MainView"

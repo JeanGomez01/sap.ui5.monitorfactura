@@ -1,4 +1,4 @@
-<mvc:View 
+<mvc:View
     controllerName="monitorfactura.project1.controller.MainView"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
@@ -8,332 +8,738 @@
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     xmlns:f="sap.f"
     xmlns:layout="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
     displayBlock="true"
-    height="100%">
-    
-    <f:DynamicPage 
-        id="dynamicPageFacturas" 
-        preserveHeaderStateOnScroll="true" 
-        headerExpanded="true" 
-        showFooter="false" 
+    height="100%"
+>
+    <f:DynamicPage
+        id="dynamicPageFacturas"
+        preserveHeaderStateOnScroll="true"
+        headerExpanded="true"
+        showFooter="false"
         fitContent="true"
         class="monitorFacturasPage"
-        >
-        
-        <!-- DynamicPage Title -->
+    >
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <Title text="Monitor de Facturas"/>
+                    <Title text="Monitor de Facturas" />
                 </f:heading>
-                
+
                 <f:expandedContent>
-                    <Label text="Gestión y seguimiento de facturas por procesar"/>
+                    <Label
+                        text="Gestión y seguimiento de facturas por procesar"
+                    />
                 </f:expandedContent>
-                
+
                 <f:snappedContent>
-                    <Label text="Monitor de Facturas"/>
+                    <Label text="Monitor de Facturas" />
                 </f:snappedContent>
-                
-                <f:content>
-                    <OverflowToolbar>
-                        <GenericTag 
-                            text="Estado"
-                            status="Success"
-                            design="StatusIconHidden">
-                            <ObjectNumber 
-                                number="{facturas>/totalFacturas}"
-                                unit="Facturas"
-                                emphasized="false"
-                                state="Success"/>
-                        </GenericTag>
-                        <ToolbarSpacer/>
-                 
-                    </OverflowToolbar>
-                </f:content>
-                
+
                 <f:actions>
-                    <ToolbarSpacer/>
-                    <Button
-                        id="btnExportar"
-                        text="Exportar"
-                        icon="sap-icon://excel-attachment"
-                        type="Transparent"
-                        press="onExportar"/>
-                    <Button
-                        id="btnActualizar"
-                        text="Actualizar"
-                        icon="sap-icon://refresh"
-                        type="Transparent"
-                        press="onActualizar"/>
+                    <OverflowToolbar
+                        id="accionesToolbar"
+                        design="Solid"
+                        width="100%"
+                    >
+                        <ToolbarSpacer id="spacerInicio" />
+
+                        <Button
+                            id="btnPosFactura"
+                            text="Pos.Factura"
+                            icon="sap-icon://documents"
+                            enabled="{mainView>/hasSelection}"
+                            press="onPosFactura"
+                        />
+
+                        <Button
+                            id="btnDocsAsignados"
+                            text="Docs.asignados"
+                            icon="sap-icon://document-text"
+                            enabled="{mainView>/hasSelection}"
+                            press="onDocsAsignados"
+                        />
+
+                        <Button
+                            id="btnProRegistrar"
+                            text="Pre-registrar"
+                            icon="sap-icon://play"
+                            enabled="{mainView>/hasSelection}"
+                            press="onPreRegistrar"
+                        />
+
+                        <Button
+                            id="btnContabilizar"
+                            text="Contabilizar"
+                            icon="sap-icon://complete"
+                            enabled="{mainView>/hasSelection}"
+                            visible="{mainView>/mostrarContabilizar}"
+                            press="onContabilizar"
+                        />
+
+                        <Button
+                            id="btnVerDocSAP"
+                            text="Ver documento SAP"
+                            icon="sap-icon://inspect"
+                            enabled="{mainView>/hasSelection}"
+                            press="onVerDocumentoSAP"
+                        />
+
+                        <Button
+                            id="btnLogEjecucion"
+                            text="Log de ejecución"
+                            icon="sap-icon://log"
+                            enabled="{mainView>/hasSelection}"
+                            press="onVerLog"
+                        />
+
+                        <Button
+                            id="btnFacturaObservada"
+                            text="Factura observada"
+                            icon="sap-icon://flag"
+                            enabled="{mainView>/hasSelection}"
+                            press="onFacturaObservada"
+                        />
+
+                        <MenuButton
+                            id="btnMas"
+                            text="Más"
+                            icon="sap-icon://overflow"
+                            enabled="{mainView>/hasSelection}"
+                        >
+                            <menu>
+                                <Menu id="menuMas">
+                                    <items>
+                                        <MenuItem
+                                            id="menuItem1"
+                                            text="Opción 1"
+                                            press="onOpcionMas"
+                                        />
+                                        <MenuItem
+                                            id="menuItem2"
+                                            text="Opción 2"
+                                            press="onOpcionMas"
+                                        />
+                                        <MenuItem
+                                            id="menuItem3"
+                                            text="Opción 3"
+                                            press="onOpcionMas"
+                                        />
+                                    </items>
+                                </Menu>
+                            </menu>
+                        </MenuButton>
+
+                        <ToolbarSpacer />
+                    </OverflowToolbar>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>
 
-        <!-- DynamicPage Header - Barra de acciones -->
         <f:header>
             <f:DynamicPageHeader pinnable="true">
-                <OverflowToolbar id="accionesToolbar" design="Solid">
-                    <ToolbarSpacer id="spacerInicio"/>
-                    
-                    <Button 
-                        id="btnPosFactura"
-                        text="Pos.Factura"
-                        icon="sap-icon://documents"
-                        enabled="{mainView>/hasSelection}"
-                        press="onPosFactura"/>
-                    
-                    <Button 
-                        id="btnDocsAsignados"
-                        text="Docs.asignados"
-                        icon="sap-icon://document-text"
-                        enabled="{mainView>/hasSelection}"
-                        press="onDocsAsignados"/>
-                    
-                    <Button 
-                        id="btnProRegistrar"
-                        text="Pre-registrar"
-                        icon="sap-icon://play"
-                      
-                        enabled="{mainView>/hasSelection}"
-                        press="onPreRegistrar"/>
-                    
-                    <Button 
-                        id="btnContabilizar"
-                        text="Contabilizar"
-                        icon="sap-icon://complete"
-                        enabled="{mainView>/hasSelection}"
-                        visible="{mainView>/mostrarContabilizar}"
-                        press="onContabilizar"/>
-                    
-                    <Button 
-                        id="btnVerDocSAP"
-                        text="Ver documento SAP"
-                        icon="sap-icon://inspect"
-                        enabled="{mainView>/hasSelection}"
-                        press="onVerDocumentoSAP"/>
-                    
-                    <Button 
-                        id="btnLogEjecucion"
-                        text="Log de ejecución"
-                        icon="sap-icon://log"
-                        enabled="{mainView>/hasSelection}"
-                        press="onVerLog"/>
-                    
-                    <Button 
-                        id="btnFacturaObservada"
-                        text="Factura observada"
-                        icon="sap-icon://flag"
-                      
-                        enabled="{mainView>/hasSelection}"
-                        press="onFacturaObservada"/>
-                    
-                    <MenuButton 
-                        id="btnMas"
-                        text="Más"
-                        icon="sap-icon://overflow"
-                        enabled="{mainView>/hasSelection}">
-                        <menu>
-                            <Menu id="menuMas">
-                                <items>
-                                    <MenuItem id="menuItem1" text="Opción 1" press="onOpcionMas"/>
-                                    <MenuItem id="menuItem2" text="Opción 2" press="onOpcionMas"/>
-                                    <MenuItem id="menuItem3" text="Opción 3" press="onOpcionMas"/>
-                                </items>
-                            </Menu>
-                        </menu>
-                    </MenuButton>
-                </OverflowToolbar>
+                <VBox
+                    id="headerFiltersBox"
+                    class="sapUiSmallMargin"
+                    width="100%"
+                >
+                    <HBox
+                        id="filtrosPrincipalesBox"
+                        alignItems="Center"
+                        justifyContent="Start"
+                        wrap="Wrap"
+                        class="sapUiSmallMarginBottom"
+                    >
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label
+                                text="{i18n>sociedad}"
+                                required="true"
+                                design="Bold"
+                            />
+                            <Input
+                                id="cbSociedad"
+                                placeholder="{i18n>seleccioneSociedad}"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class=""
+                            width="100px"
+                        >
+                            <Label text="División" />
+                            <Input
+                                id="divisionInputDe"
+                                placeholder="Desde"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text=" " />
+                            <Input
+                                id="divisionInputHasta"
+                                placeholder="Hasta"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class=""
+                            width="100px"
+                        >
+                            <Label text="Proveedor" />
+                            <Input
+                                id="proveedorInputDe"
+                                placeholder="Desde"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text=" " />
+                            <Input
+                                id="proveedorInputHasta"
+                                placeholder="Hasta"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class=""
+                            width="100px"
+                        >
+                            <Label text="Fecha Reg." />
+                            <DatePicker
+                                id="fechaRegistroDe"
+                                placeholder="Desde"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text=" " />
+                            <DatePicker
+                                id="fechaRegistroHasta"
+                                placeholder="Hasta"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+                        <VBox
+                            class=" "
+                            width="100px"
+                        >
+                            <Label text="Fecha Emisión" />
+                            <DatePicker
+                                id="fechaEmisionDe"
+                                placeholder="Desde"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text=" " />
+                            <DatePicker
+                                id="fechaEmisionHasta"
+                                placeholder="Hasta"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class=" "
+                            width="100px"
+                        >
+                            <Label text="Fecha Venc." />
+                            <DatePicker
+                                id="fechaVencimientoDe"
+                                placeholder="Desde"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text=" " />
+                            <DatePicker
+                                id="fechaVencimientoHasta"
+                                placeholder="Hasta"
+                                displayFormat="dd/MM/yyyy"
+                                width="100px"
+                            />
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="100px"
+                        >
+                            <Label text="Estado" />
+                            <Select
+                                id="estadoSelect"
+                                width="100px"
+                            >
+                                <core:Item
+                                    text="Todos"
+                                    key=""
+                                />
+                                <core:Item
+                                    text="Aprobada"
+                                    key="Aprobada"
+                                />
+                                <core:Item
+                                    text="Pendiente"
+                                    key="Pendiente"
+                                />
+                                <core:Item
+                                    text="Observada"
+                                    key="Observada"
+                                />
+                            </Select>
+                        </VBox>
+
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            width="200px"
+                        >
+                            <Label
+                                text="Tipo de Documento:"
+                                class="sapUiSmallMarginEnd"
+                                design="Bold"
+                            />
+                            <ComboBox
+                                id="tipoDocRadioGroup"
+                                width="220px"
+                                placeholder="Seleccione tipo"
+                                change="onTipoDocumentoChange"
+                            >
+                                <core:Item
+                                    text="Factura Suministro"
+                                    key="Factura Suministro"
+                                />
+                                <core:Item
+                                    text="Factura Servicios"
+                                    key="Factura Servicios"
+                                />
+                                <core:Item
+                                    text="Factura sin Referencia"
+                                    key="Sin Referencia"
+                                />
+                                <core:Item
+                                    text="Nota Crédito"
+                                    key="Nota Crédito"
+                                />
+                            </ComboBox>
+                        </VBox>
+                        <VBox
+                            class="sapUiSmallMarginEnd"
+                            justifyContent="End"
+                        >
+                            <Label text=" " />
+                            <HBox alignItems="Center">
+                                <Button
+                                    id="btnBuscarFiltros"
+                                    text="Buscar"
+                                    type="Emphasized"
+                                    icon="sap-icon://search"
+                                    press="onBuscar"
+                                    width="auto"
+                                />
+                                <Button
+                                    id="btnLimpiarFiltros"
+                                    text="Limpiar"
+                                    icon="sap-icon://clear-all"
+                                    press="onLimpiarFiltros"
+                                    width="auto"
+                                />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
             </f:DynamicPageHeader>
         </f:header>
 
-        <!-- DynamicPage Content - Tabla principal -->
         <f:content>
-         <ScrollContainer 
-            id="tableScrollContainer"
-            height="100%"
-            width="100%"
-            vertical="true"
-            horizontal="true"
-            focusable="true">
-            <!-- Smart Table Principal -->
-            <smartTable:SmartTable 
-                id="smartTableFacturas"
-                entitySet="Facturas"
-                smartFilterId=""
-                enableExport="true"
-                beforeExport="onBeforeExport"
-                useVariantManagement="false"
-                useTablePersonalisation="true"
-                header="Lista de Facturas"
-                showRowCount="true"
-                persistencyKey="MonitorFacturasTable"
-                enableAutoBinding="false"
-                enableAutoColumnWidth="true" 
-                class="sapUiResponsiveContentPadding scrollableTable"
-                beforeRebindTable="onBeforeRebindTable"
-                app:preserveDecimals="false">
-                
-                <smartTable:customToolbar>
-                    <OverflowToolbar design="Transparent">
-                        <Title text="Facturas por procesar"/>
-                        <ToolbarSpacer/>
-                        <Text text="Total: {facturas>/totalFacturas}"/>
-                    </OverflowToolbar>
-                </smartTable:customToolbar>
-                
-                <!-- Tabla interna -->
-                <Table 
-                    id="tablaFacturas"
-                    mode="SingleSelectMaster"
-                    selectionChange="onSelectionChange"
-                    items="{path: 'facturas>/facturas'}"
-                    fixedLayout="false"
-                    width="auto"
-                    class="sapUiSizeCompact"
-                > 
-                    
-                    <columns>
-                        <!-- Checkbox de Selección -->
-                        <Column id="colCheckbox" width="3em" hAlign="Center">
-                            <CheckBox 
-                                id="headerCheckbox"
-                                select="onSelectAll"/>
-                        </Column>
-                        
-                        <!-- Estado -->
-                        <Column id="colEstado" width="4em" hAlign="Center">
-                            <Text id="headerEstado" text="Estado"/>
-                        </Column>
-                        
-                        <Column id="colEscenario" width="5em">
-                            <Text id="headerEscenario" text="Escenario"/>
-                        </Column>
-                        
-                        <Column id="colSociedad" width="5em">
-                            <Text id="headerSociedad" text="Sociedad"/>
-                        </Column>
-                        
-                        <Column id="colCodigo" width="5em">
-                            <Text id="headerCodigo" text="Código"/>
-                        </Column>
-                        
-                        <Column id="colRucProveedor" width="8em">
-                            <Text id="headerRucProveedor" text="RUC proveedor"/>
-                        </Column>
-                        
-                        <Column id="colProveedor" width="8em">
-                            <Text id="headerProveedor" text="Proveedor"/>
-                        </Column>
-                        
-                        <Column id="colNombre" width="18em">
-                            <Text id="headerNombre" text="Nombre"/>
-                        </Column>
-                        
-                        <Column id="colCondPago" width="6em">
-                            <Text id="headerCondPago" text="Cond. pago"/>
-                        </Column>
-                        
-                        <Column id="colTipoDoc" width="5.5em">
-                            <Text id="headerTipoDoc" text="Tipo"/>
-                        </Column>
-                        
-                        <Column id="colReferencia" width="13em">
-                            <Text id="headerReferencia" text="Referencia"/>
-                        </Column>
-                        
-                        <Column id="colFechaEmision" width="7.5em">
-                            <Text id="headerFechaEmision" text="Fecha Emisión"/>
-                        </Column>
-                        
-                        <Column id="colFechaRegistro" width="7.5em">
-                            <Text id="headerFechaRegistro" text="Fecha Registro"/>
-                        </Column>
-                        
-                        <Column id="colFechaVencimiento" width="7.5em">
-                            <Text id="headerFechaVencim" text="Fecha Vencimiento"/>
-                        </Column>
-                        
-                        <Column id="colFechaBase" width="7.5em">
-                            <Text id="headerFechaBase" text="Fecha Base"/>
-                        </Column>
-                        
-                        <Column id="colFechaContable" width="7.5em">
-                            <Text id="headerFechaContable" text="Fecha Contable"/>
-                        </Column>
-                        
-                        <Column id="colNumDocLogistico" width="9em">
-                            <Text id="headerNumDocLog" text="N° Doc. logístico."/>
-                        </Column>
-                        
-                        <Column id="colEjercicio" width="5.5em">
-                            <Text id="headerEjercicio" text="Ejerc."/>
-                        </Column>
-                    </columns>
-                    
-                    <items>
-                        <ColumnListItem id="itemTemplate" type="Active">
-                            <cells>
-                                <!-- Checkbox Individual -->
-                                <CheckBox 
-                                    id="itemCheckbox"
-                                    selected="{facturas>selected}"
-                                    select="onCheckboxSelect"/>
-                                
-                                <!-- Estado: Check verde o círculo amarillo -->
-                                <HBox id="cellEstado" justifyContent="Center" alignItems="Center">
-                                    <core:Icon 
-                                        id="iconEstado"
-                                        src="{= ${facturas>estado} === 'Aprobada' ? 'sap-icon://accept' : 
+            <ScrollContainer
+                id="tableScrollContainer"
+                height="100%"
+                width="100%"
+                vertical="true"
+                horizontal="true"
+                focusable="true"
+            >
+                <smartTable:SmartTable
+                    id="smartTableFacturas"
+                    entitySet="Facturas"
+                    smartFilterId=""
+                    enableExport="true"
+                    beforeExport="onBeforeExport"
+                    useVariantManagement="false"
+                    useTablePersonalisation="true"
+                    header="Lista de Facturas"
+                    showRowCount="true"
+                    persistencyKey="MonitorFacturasTable"
+                    enableAutoBinding="false"
+                    enableAutoColumnWidth="true"
+                    class="sapUiResponsiveContentPadding scrollableTable"
+                    beforeRebindTable="onBeforeRebindTable"
+                    app:preserveDecimals="false"
+                >
+                    <smartTable:customToolbar>
+                        <OverflowToolbar design="Transparent">
+                            <Title text="Facturas por procesar" />
+                            <ToolbarSpacer />
+                            <Text text="Total: {facturas>/totalFacturas}" />
+                        </OverflowToolbar>
+                    </smartTable:customToolbar>
+
+                    <Table
+                        id="tablaFacturas"
+                        mode="SingleSelectMaster"
+                        selectionChange="onSelectionChange"
+                        items="{path: 'facturas>/facturas'}"
+                        fixedLayout="false"
+                        width="auto"
+                        class="sapUiSizeCompact"
+                    >
+                        <columns>
+                            <Column
+                                id="colCheckbox"
+                                width="3em"
+                                hAlign="Center"
+                            >
+                                <CheckBox
+                                    id="headerCheckbox"
+                                    select="onSelectAll"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colEstado"
+                                width="4em"
+                                hAlign="Center"
+                            >
+                                <Text
+                                    id="headerEstado"
+                                    text="Estado"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colEscenario"
+                                width="5em"
+                            >
+                                <Text
+                                    id="headerEscenario"
+                                    text="Escenario"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colSociedad"
+                                width="5em"
+                            >
+                                <Text
+                                    id="headerSociedad"
+                                    text="Sociedad"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colCodigo"
+                                width="5em"
+                            >
+                                <Text
+                                    id="headerCodigo"
+                                    text="Código"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colRucProveedor"
+                                width="8em"
+                            >
+                                <Text
+                                    id="headerRucProveedor"
+                                    text="RUC proveedor"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colProveedor"
+                                width="8em"
+                            >
+                                <Text
+                                    id="headerProveedor"
+                                    text="Proveedor"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colNombre"
+                                width="18em"
+                            >
+                                <Text
+                                    id="headerNombre"
+                                    text="Nombre"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colCondPago"
+                                width="6em"
+                            >
+                                <Text
+                                    id="headerCondPago"
+                                    text="Cond. pago"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colTipoDoc"
+                                width="5.5em"
+                            >
+                                <Text
+                                    id="headerTipoDoc"
+                                    text="Tipo"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colReferencia"
+                                width="13em"
+                            >
+                                <Text
+                                    id="headerReferencia"
+                                    text="Referencia"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colFechaEmision"
+                                width="7.5em"
+                            >
+                                <Text
+                                    id="headerFechaEmision"
+                                    text="Fecha Emisión"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colFechaRegistro"
+                                width="7.5em"
+                            >
+                                <Text
+                                    id="headerFechaRegistro"
+                                    text="Fecha Registro"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colFechaVencimiento"
+                                width="7.5em"
+                            >
+                                <Text
+                                    id="headerFechaVencim"
+                                    text="Fecha Vencimiento"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colFechaBase"
+                                width="7.5em"
+                            >
+                                <Text
+                                    id="headerFechaBase"
+                                    text="Fecha Base"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colFechaContable"
+                                width="7.5em"
+                            >
+                                <Text
+                                    id="headerFechaContable"
+                                    text="Fecha Contable"
+                                />
+                            </Column>
+
+                            <Column
+                                id="colNumDocLogistico"
+                                width="9em"
+                            >
+                                <Text
+                                    id="headerNumDocLog"
+                                    text="N° Doc. logístico."
+                                />
+                            </Column>
+
+                            <Column
+                                id="colEjercicio"
+                                width="5.5em"
+                            >
+                                <Text
+                                    id="headerEjercicio"
+                                    text="Ejerc."
+                                />
+                            </Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem
+                                id="itemTemplate"
+                                type="Active"
+                            >
+                                <cells>
+                                    <CheckBox
+                                        id="itemCheckbox"
+                                        selected="{facturas>selected}"
+                                        select="onCheckboxSelect"
+                                    />
+
+                                    <HBox
+                                        id="cellEstado"
+                                        justifyContent="Center"
+                                        alignItems="Center"
+                                    >
+                                        <core:Icon
+                                            id="iconEstado"
+                                            src="{= ${facturas>estado} === 'Aprobada' ? 'sap-icon://accept' : 
                                               ${facturas>estado} === 'Pendiente' ? 'sap-icon://pending' : 
                                               ${facturas>estado} === 'Observada' ? 'sap-icon://warning' : 'sap-icon://status-inactive' }"
-                                        color="{= ${facturas>estado} === 'Aprobada' ? '#2b7d2b' : 
+                                            color="{= ${facturas>estado} === 'Aprobada' ? '#2b7d2b' : 
                                                ${facturas>estado} === 'Pendiente' ? '#0070f0' : 
                                                ${facturas>estado} === 'Observada' ? '#e9730c' : '#6a6d70' }"
-                                        size="0.875rem"/>
-                                </HBox>
-                                
-                                <Text id="cellEscenario" width="6em" text="{facturas>escenario}"/>
-                                <Text id="cellSociedad" width="5.5em" text="{facturas>sociedad}"/>
-                                <Text id="cellCodigo" width="5.5em" text="{facturas>codigo}"/>
-                                <Text id="cellRucProveedor" width="8.5em" text="{facturas>rucProveedor}"/>
-                                <Text id="cellProveedor" width="9em" text="{facturas>proveedor}"/>
-                                <Text id="cellNombre" width="20em" text="{facturas>nombre}"/>
-                                <Text id="cellCondPago" width="7em" text="{facturas>condPago}"/>
-                                <Text id="cellTipoDoc" width="6em" text="{facturas>tipoDoc}"/>
-                                <Text id="cellReferencia" width="10rem" text="{facturas>referencia}"/>
-                                <Text id="cellFechaEmision" width="8.5em" text="{facturas>fechaEmision}"/>
-                                <Text id="cellFechaRegistro" width="8.5em" text="{facturas>fechaRegistro}"/>
-                                <Text id="cellFechaVencimiento" width="8.5em" text="{facturas>fechaVencimiento}"/>
-                                <Text id="cellFechaBase" width="8.5em" text="{facturas>fechaBase}"/>
-                                <Text id="cellFechaContable" width="8.5em" text="{facturas>fechaContable}"/>
-                                <Text id="cellNumDocLogistico" width="10em" text="{facturas>numeroDocLogistico}"/>
-                                <Text id="cellEjercicio" width="6em" text="{facturas>ejercicio}"/>
-                            </cells>
-                        </ColumnListItem>
-                    </items>
-                </Table>
-                
-                <smartTable:copyProvider>
-                    <plugins:CopyProvider id="copyProvider"/>
-                </smartTable:copyProvider>
-                
-            </smartTable:SmartTable>
-            </ScrollContainer> 
+                                            size="0.875rem"
+                                        />
+                                    </HBox>
+
+                                    <Text
+                                        id="cellEscenario"
+                                        width="6em"
+                                        text="{facturas>escenario}"
+                                    />
+                                    <Text
+                                        id="cellSociedad"
+                                        width="5.5em"
+                                        text="{facturas>sociedad}"
+                                    />
+                                    <Text
+                                        id="cellCodigo"
+                                        width="5.5em"
+                                        text="{facturas>codigo}"
+                                    />
+                                    <Text
+                                        id="cellRucProveedor"
+                                        width="8.5em"
+                                        text="{facturas>rucProveedor}"
+                                    />
+                                    <Text
+                                        id="cellProveedor"
+                                        width="9em"
+                                        text="{facturas>proveedor}"
+                                    />
+                                    <Text
+                                        id="cellNombre"
+                                        width="20em"
+                                        text="{facturas>nombre}"
+                                    />
+                                    <Text
+                                        id="cellCondPago"
+                                        width="7em"
+                                        text="{facturas>condPago}"
+                                    />
+                                    <Text
+                                        id="cellTipoDoc"
+                                        width="6em"
+                                        text="{facturas>tipoDoc}"
+                                    />
+                                    <Text
+                                        id="cellReferencia"
+                                        width="10rem"
+                                        text="{facturas>referencia}"
+                                    />
+                                    <Text
+                                        id="cellFechaEmision"
+                                        width="8.5em"
+                                        text="{facturas>fechaEmision}"
+                                    />
+                                    <Text
+                                        id="cellFechaRegistro"
+                                        width="8.5em"
+                                        text="{facturas>fechaRegistro}"
+                                    />
+                                    <Text
+                                        id="cellFechaVencimiento"
+                                        width="8.5em"
+                                        text="{facturas>fechaVencimiento}"
+                                    />
+                                    <Text
+                                        id="cellFechaBase"
+                                        width="8.5em"
+                                        text="{facturas>fechaBase}"
+                                    />
+                                    <Text
+                                        id="cellFechaContable"
+                                        width="8.5em"
+                                        text="{facturas>fechaContable}"
+                                    />
+                                    <Text
+                                        id="cellNumDocLogistico"
+                                        width="10em"
+                                        text="{facturas>numeroDocLogistico}"
+                                    />
+                                    <Text
+                                        id="cellEjercicio"
+                                        width="6em"
+                                        text="{facturas>ejercicio}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+
+                    <smartTable:copyProvider>
+                        <plugins:CopyProvider id="copyProvider" />
+                    </smartTable:copyProvider>
+                </smartTable:SmartTable>
+            </ScrollContainer>
         </f:content>
 
-        <!-- DynamicPage Footer -->
         <f:footer>
             <OverflowToolbar>
-                <ToolbarSpacer/>
-                <Button 
-                    type="Emphasized" 
+                <ToolbarSpacer />
+                <Button
+                    type="Emphasized"
                     text="Aplicar Filtros"
-                    press="onAplicarFiltros"/>
-                <Button 
-                    type="Reject" 
+                    press="onAplicarFiltros"
+                />
+                <Button
+                    type="Reject"
                     text="Limpiar Selección"
-                    press="onLimpiarSeleccion"/>
+                    press="onLimpiarSeleccion"
+                />
             </OverflowToolbar>
         </f:footer>
     </f:DynamicPage>

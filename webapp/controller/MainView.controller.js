@@ -34,6 +34,116 @@ sap.ui.define([
         },
 
         /**
+         * Obtener el tipo de documento seleccionado
+         * @private
+         * @returns {string} Tipo de documento
+         */
+        _getTipoDocumentoSeleccionado() {
+
+
+            const oView = this.getView();
+            const oCombo = oView.byId("tipoDocRadioGroup");
+            if (!oCombo) {
+                return "FacturaSuministro";
+            }
+
+
+            const sKey = (typeof oCombo.getSelectedKey === "function") ? oCombo.getSelectedKey() : (oCombo.getValue ? oCombo.getValue() : "");
+
+            const mMap = {
+                "Factura Suministro": "FacturaSuministro",
+                "Factura Servicios": "FacturaServicios",
+                "Sin Referencia": "SinReferencia",
+                "Nota Crédito": "NotaCredito",
+
+                "FacturaSuministro": "FacturaSuministro",
+                "FacturaServicios": "FacturaServicios",
+                "SinReferencia": "SinReferencia",
+                "NotaCredito": "NotaCredito"
+            };
+
+            return mMap[sKey] || "FacturaSuministro";
+        },
+
+        /**
+         * Evento al cambiar el tipo de documento en el ComboBox
+         * @param {sap.ui.base.Event} oEvent - Evento de cambio
+         */
+        onTipoDocumentoChange(oEvent) {
+            const sTipoDocumento = this._getTipoDocumentoSeleccionado();
+            const oMainViewModel = this.getView().getModel("mainView");
+            const bMostrarContabilizar = sTipoDocumento !== "SinReferencia";
+            oMainViewModel.setProperty("/mostrarContabilizar", bMostrarContabilizar);
+        },
+
+        onBuscar() {
+            const oView = this.getView();
+
+
+            const oFiltros = {
+
+                sociedad: (oView.byId("cbSociedad") && oView.byId("cbSociedad").getValue) ? oView.byId("cbSociedad").getValue().trim() : "",
+                divisionDe: oView.byId("divisionInputDe").getValue().trim() || "",
+                divisionHasta: oView.byId("divisionInputHasta").getValue().trim() || "",
+                proveedorDe: oView.byId("proveedorInputDe").getValue().trim() || "",
+                proveedorHasta: oView.byId("proveedorInputHasta").getValue().trim() || "",
+                fechaRegistroDe: oView.byId("fechaRegistroDe").getValue() || "",
+                fechaRegistroHasta: oView.byId("fechaRegistroHasta").getValue() || "",
+                fechaEmisionDe: oView.byId("fechaEmisionDe") ? oView.byId("fechaEmisionDe").getValue() || "" : "",
+                fechaEmisionHasta: oView.byId("fechaEmisionHasta") ? oView.byId("fechaEmisionHasta").getValue() || "" : "",
+                fechaVencimientoDe: oView.byId("fechaVencimientoDe") ? oView.byId("fechaVencimientoDe").getValue() || "" : "",
+                fechaVencimientoHasta: oView.byId("fechaVencimientoHasta") ? oView.byId("fechaVencimientoHasta").getValue() || "" : "",
+                estado: oView.byId("estadoSelect").getSelectedKey() || "",
+                tipoDocumento: this._getTipoDocumentoSeleccionado()
+            };
+
+
+            if (!oFiltros.sociedad) {
+                MessageBox.warning("Por favor, seleccione una Sociedad para continuar.");
+                return;
+            }
+
+
+            if (!this._validarRangos(oFiltros)) {
+                return;
+            }
+
+            this._cargarDatos(oFiltros);
+
+            MessageToast.show("Buscando facturas con los criterios seleccionados...");
+        },
+
+        /**
+         * Evento al presionar el botón Limpiar Filtros
+         */
+        onLimpiarFiltros() {
+            const oView = this.getView();
+
+
+            if (oView.byId("cbSociedad") && oView.byId("cbSociedad").setValue) {
+                oView.byId("cbSociedad").setValue("");
+            }
+            oView.byId("divisionInputDe").setValue("");
+            oView.byId("divisionInputHasta").setValue("");
+            oView.byId("proveedorInputDe").setValue("");
+            oView.byId("proveedorInputHasta").setValue("");
+            oView.byId("fechaRegistroDe").setValue("");
+            oView.byId("fechaRegistroHasta").setValue("");
+            if (oView.byId("fechaEmisionDe")) { oView.byId("fechaEmisionDe").setValue(""); }
+            if (oView.byId("fechaEmisionHasta")) { oView.byId("fechaEmisionHasta").setValue(""); }
+            if (oView.byId("fechaVencimientoDe")) { oView.byId("fechaVencimientoDe").setValue(""); }
+            if (oView.byId("fechaVencimientoHasta")) { oView.byId("fechaVencimientoHasta").setValue(""); }
+            oView.byId("estadoSelect").setSelectedKey("");
+
+            const oTipoCombo = oView.byId("tipoDocRadioGroup");
+            if (oTipoCombo && typeof oTipoCombo.setSelectedKey === "function") {
+
+                oTipoCombo.setSelectedKey("");
+            }
+
+            MessageToast.show("Filtros limpiados");
+        },
+        /**
          * Método llamado cuando se accede a esta ruta
          * @private
          */
@@ -45,8 +155,8 @@ sap.ui.define([
 
                 this._mostrarFiltrosAplicados(oFiltros);
                 this._cargarDatos(oFiltros);
-                
-                // Controlar visibilidad del botón Contabilizar según tipo de documento
+
+
                 const oMainViewModel = this.getView().getModel("mainView");
                 const bMostrarContabilizar = oFiltros.tipoDocumento !== "SinReferencia";
                 oMainViewModel.setProperty("/mostrarContabilizar", bMostrarContabilizar);
@@ -56,7 +166,20 @@ sap.ui.define([
                 MessageToast.show("No hay filtros aplicados");
             }
         },
-
+        /**
+                            * Inicializar modelo de filtros con opciones de sociedades
+                            * @private
+                            */
+        _initFilterModel() {
+            const oFiltersModel = new JSONModel({
+                sociedades: [
+                    { codigo: "S001", nombre: "Sociedad 1" },
+                    { codigo: "S002", nombre: "Sociedad 2" },
+                    { codigo: "S003", nombre: "Sociedad 3" }
+                ]
+            });
+            this.getView().setModel(oFiltersModel, "filters");
+        },
         /**
          * Ajustar el ancho de la tabla basado en el contenido
          * @private
@@ -70,11 +193,79 @@ sap.ui.define([
 
                     aColumns.forEach((oColumn) => {
                         iTotalWidth += this._getColumnWidth(oColumn);
+
+
+                        this._initFilterModel();
                     });
+
+
                 }
             }, 500);
         },
 
+
+        /**
+         * Validar rangos de filtros
+         * @private
+         * @param {object} oFiltros - Objeto con filtros
+         * @returns {boolean} True si son válidos
+         */
+        _validarRangos(oFiltros) {
+
+            if (oFiltros.divisionDe && oFiltros.divisionHasta) {
+                if (oFiltros.divisionDe > oFiltros.divisionHasta) {
+                    MessageBox.error("El rango de División es inválido. El valor inicial no puede ser mayor que el final.");
+                    return false;
+                }
+            }
+
+
+            if (oFiltros.proveedorDe && oFiltros.proveedorHasta) {
+                if (oFiltros.proveedorDe > oFiltros.proveedorHasta) {
+                    MessageBox.error("El rango de Proveedor es inválido. El valor inicial no puede ser mayor que el final.");
+                    return false;
+                }
+            }
+
+
+            if (oFiltros.fechaRegistroDe && oFiltros.fechaRegistroHasta) {
+                if (new Date(this._convertirFecha(oFiltros.fechaRegistroDe)) > new Date(this._convertirFecha(oFiltros.fechaRegistroHasta))) {
+                    MessageBox.error("El rango de Fecha de Registro es inválido.");
+                    return false;
+                }
+            }
+
+            if (oFiltros.fechaEmisionDe && oFiltros.fechaEmisionHasta) {
+                if (new Date(this._convertirFecha(oFiltros.fechaEmisionDe)) > new Date(this._convertirFecha(oFiltros.fechaEmisionHasta))) {
+                    MessageBox.error("El rango de Fecha de Emisión es inválido.");
+                    return false;
+                }
+            }
+
+            if (oFiltros.fechaVencimientoDe && oFiltros.fechaVencimientoHasta) {
+                if (new Date(this._convertirFecha(oFiltros.fechaVencimientoDe)) > new Date(this._convertirFecha(oFiltros.fechaVencimientoHasta))) {
+                    MessageBox.error("El rango de Fecha de Vencimiento es inválido.");
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        /**
+         * Convertir fecha del formato dd/MM/yyyy a yyyy-MM-dd
+         * @private
+         * @param {string} sFecha - Fecha en formato dd/MM/yyyy
+         * @returns {string} Fecha en formato yyyy-MM-dd
+         */
+        _convertirFecha(sFecha) {
+            if (!sFecha) return "";
+            const aParts = sFecha.split("/");
+            if (aParts.length === 3) {
+                return `${aParts[2]}-${aParts[1]}-${aParts[0]}`;
+            }
+            return sFecha;
+        },
         /**
          * Obtener el ancho de una columna
          * @private
@@ -112,8 +303,12 @@ sap.ui.define([
                 sMensaje += `- División: ${oFiltros.division || ""} ${oFiltros.divisionA ? "a " + oFiltros.divisionA : ""}\n`;
             }
 
+
+
+            this._initFilterModel();
             if (oFiltros.proveedor || oFiltros.proveedorA) {
                 sMensaje += `- Proveedor: ${oFiltros.proveedor || ""} ${oFiltros.proveedorA ? "a " + oFiltros.proveedorA : ""}\n`;
+
             }
 
             sMensaje += `- Tipo: ${this._formatTipoDocumento(oFiltros.tipoDocumento)}`;
@@ -389,9 +584,7 @@ sap.ui.define([
             const oMainViewModel = this.getView().getModel("mainView");
             const oFacturasModel = this.getView().getModel("facturas");
             const aFacturas = oFacturasModel.getProperty("/facturas");
-            const oFiltrosModel = this.getOwnerComponent().getModel("filtros");
-            const oFiltros = oFiltrosModel ? oFiltrosModel.getData() : {};
-
+            const sTipoDocumento = this._getTipoDocumentoSeleccionado();
             const aSelectedFacturas = aFacturas.filter(oFactura => oFactura.selected === true);
 
             if (aSelectedFacturas.length === 0) {
@@ -399,11 +592,10 @@ sap.ui.define([
                 return;
             }
 
-            // Verificar si es factura sin referencia (miscelánea)
-            if (oFiltros.tipoDocumento === "SinReferencia") {
+            if (sTipoDocumento === "SinReferencia") {
                 this._showPreRegistroMiscDialog(aSelectedFacturas[0]);
             } else {
-                // Mostrar diálogo de confirmación normal
+
                 this._showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel);
             }
         },
@@ -422,7 +614,7 @@ sap.ui.define([
                 this.getView().addDependent(this._oPreRegistroMiscDialog);
             }
 
-            // Crear modelo con datos iniciales
+
             const oMiscModel = new JSONModel({
                 fechaContable: oFactura.fechaContable,
                 fechaBase: oFactura.fechaBase,
@@ -456,10 +648,10 @@ sap.ui.define([
          */
         _showPreRegistroConfirmDialog(aSelectedFacturas, oMainViewModel) {
             let sMessage = `Confirme el pre-registro de ${aSelectedFacturas.length} factura(s):\n\n`;
-            
+
             aSelectedFacturas.forEach((oFactura, index) => {
                 sMessage += `Factura Nro ${index + 1}:\n`;
-          
+
                 sMessage += `Fecha Contable: ${oFactura.fechaContable}\n`;
                 sMessage += `Fecha Base: ${oFactura.fechaBase}\n`;
                 sMessage += `Glosa de factura: ${oFactura.nombre}\n\n`;
@@ -486,7 +678,7 @@ sap.ui.define([
         _ejecutarPreRegistro(aSelectedFacturas, oMainViewModel) {
             MessageToast.show(`Procesando ${aSelectedFacturas.length} factura(s)...`);
             oMainViewModel.setProperty("/processing", true);
-            
+
             setTimeout(() => {
                 this._procesarPreRegistro(aSelectedFacturas);
                 oMainViewModel.setProperty("/processing", false);
@@ -531,7 +723,7 @@ sap.ui.define([
                 return;
             }
 
-            // Simular log del último registro ejecutado
+
             const sLogMessage = this._getLogMessage(oSelectedFactura);
 
             MessageBox.information(sLogMessage, {
@@ -552,7 +744,7 @@ sap.ui.define([
             sLog += `Referencia: ${oFactura.referencia}\n`;
             sLog += `Estado: ${oFactura.estado}\n`;
             sLog += `Fecha de registro: ${oFactura.fechaRegistro}\n\n`;
-              
+
             return sLog;
         },
 
@@ -617,7 +809,7 @@ sap.ui.define([
 
             if (aPosiciones.length > 1) {
                 aPosiciones.splice(iIndex, 1);
-                // Reordenar posiciones
+
                 aPosiciones.forEach((oPos, index) => {
                     oPos.posicion = index + 1;
                 });
@@ -634,7 +826,7 @@ sap.ui.define([
             const oMiscModel = this.getView().getModel("preRegistroMisc");
             const aPosiciones = oMiscModel.getProperty("/posiciones");
 
-            // Validar que todas las posiciones tengan cuenta contable y centro de costo
+
             let bValid = true;
             aPosiciones.forEach((oPos) => {
                 if (!oPos.cuentaContable || !oPos.centroCosto) {
@@ -647,7 +839,7 @@ sap.ui.define([
                 return;
             }
 
-            // Simular procesamiento
+
             const oMainViewModel = this.getView().getModel("mainView");
             oMainViewModel.setProperty("/processing", true);
 
@@ -655,7 +847,7 @@ sap.ui.define([
                 this._oPreRegistroMiscDialog.close();
                 oMainViewModel.setProperty("/processing", false);
 
-                // Actualizar estado de la factura
+
                 const oFacturasModel = this.getView().getModel("facturas");
                 const aFacturas = oFacturasModel.getProperty("/facturas");
                 aFacturas.forEach((oFactura, index) => {

@@ -8,15 +8,12 @@ sap.ui.define([
     return Controller.extend("monitorfactura.project1.controller.Detalle", {
 
         onInit: function () {
-            // Modelo para los datos del detalle
             const oDetalleModel = new JSONModel({
                 items: [],
                 totalItems: 0,
                 facturaSeleccionada: {}
             });
             this.getView().setModel(oDetalleModel, "detalle");
-
-            // Obtener la factura seleccionada del modelo global
             this._cargarDetalleFactura();
         },
 
@@ -38,7 +35,6 @@ sap.ui.define([
         },
 
         _cargarDatosDetalle: function (oFactura) {
-            // Datos de ejemplo para el detalle
             const aDetalles = [
                 {
                     posFactura: "0010",
@@ -73,7 +69,6 @@ sap.ui.define([
             oDetalleModel.setProperty("/items", aDetalles);
             oDetalleModel.setProperty("/totalItems", aDetalles.length);
 
-            // Actualizar título de la página
             this.byId("detallePage").setTitle(`Detalle - ${oFactura.referencia || oFactura.numeroFactura}`);
         },
 
